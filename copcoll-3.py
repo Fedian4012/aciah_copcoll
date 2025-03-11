@@ -24,4 +24,6 @@ fenetre = Tk()
 label = Label(fenetre, text="Hello World")
 label.pack()
 
+fenetre.title("Hello World")
+fenetre.minsize(320,200)
 fenetre.mainloop()
