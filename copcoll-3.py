@@ -17,13 +17,14 @@ Description : Permet de copier rapidement des morceaux de texte prédéfinis
 
 """
 
-from tkinter import *
- 
-fenetre = Tk()
+from gi.repository import Gtk
+import yaml
 
-label = Label(fenetre, text="Hello World")
-label.pack()
-
-fenetre.title("Hello World")
-fenetre.minsize(320,200)
-fenetre.mainloop()
+window = Gtk.Window()
+window.set_title("CopColl")
+window.set_default_size(400,300)
+label = Gtk.Label(label='Bienvenue sur CopColl')
+window.add(label)
+window.show_all()
+window.connect('delete-event', Gtk.main_quit)
+Gtk.main()
