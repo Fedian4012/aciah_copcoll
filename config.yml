@@ -2,9 +2,6 @@ raccourcis:
   - adresses:
     - "Papa": "69 Rue QQchose, 12345 Une-ville"
     - "Papi": "33 Avenue Autre-Machin, 67890 Une-autre-ville"
-  - numeros_tel:
-    - "Papa": "06 12 34 56 78"
-    - "Papi": "07 12 12 12 12"
-  - e-mails:
-    - "Papa": "papa@son-fai.fr"
-    - "Papi": "papi@son-autre-fai.fr"
+  - codes-postaux:
+    - "Nantes": 44000
+    - "Riaillé": 44440

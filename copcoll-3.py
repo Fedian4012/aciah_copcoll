@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding:Utf-8 -*- 
 
 """
 Version basée sur GTK 2 :
@@ -9,14 +10,15 @@ Version basée sur GTK 2 :
 Version basée sur GTK 3 :
     Auteur :      Fedian4012 (francois.fedian.4012@free.fr)
     licence :     GNU General Public Licence v3
-    Dépendances : python3-pygobject, python3-pyyaml
+    Dépendances : python3-pygobject, python3-pyyaml, libnotify (pas une librairie Python)
 
 Description : Permet de copier rapidement des morceaux de texte prédéfinis
 
 """
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 import yaml
+import os
 
 class CopColl:
     def __init__(self, config_file):
@@ -75,24 +77,36 @@ class CopColl:
             # Remarque : on itère ici sur category_data qui est supposé être un dictionnaire ou une liste de dictionnaires
             for sub_category in category_data:
                 for sub_key, sub_value in sub_category.items():
-                    # Crée un label pour chaque sous-clé et sa valeur
-                    sub_label = Gtk.Label(label=f"{sub_key}: {sub_value}")
-                    category_content.pack_start(sub_label, False, False, 0)
+
+                    # Crée un bouton avec la clé comme libellé
+                    button = Gtk.Button.new_with_label(f"{sub_key}")
+
+                    # Connecte l'événement de clic à la fonction set_clipboard avec la valeur à copier
+                    button.connect("clicked", lambda widget, text=str(sub_value): self.set_clipboard(text))
+
+                    # Ajoute le bouton au conteneur
+                    category_content.pack_start(button, False, False, 0)
 
             # Ajoute le contenu de la catégorie à la page
             page.add(category_content)
-            
+
             # Crée un label pour le titre de l'onglet
             label = Gtk.Label(label=f"{category}")  # Titre de l'onglet
             categories_notebook.append_page(page, label)  # Ajout de la page au notebook
 
-
+    def set_clipboard(self, text):
+        """Met un texte défini dans le presse-papiers"""
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        clipboard.set_text(text, -1)
+        clipboard.store()
+        os.system(f'notify-send "Texte copié" "Le texte {text} a été copié dans le presse-papiers."')
 
     def close_application(self, widget=None, event=None, data=None):
         """Ferme l'application"""
         Gtk.main_quit()
 
-def main():   
+def main():
+    """Fonction principale"""   
     # Crée une instance de CopColl et lance l'application
     copcoll = CopColl("config.yml")
 

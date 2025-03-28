@@ -92,7 +92,8 @@ class CopColl:
         """Ferme l'application"""
         Gtk.main_quit()
 
-def main():   
+def main():
+    """Fonction principale"""   
     # Crée une instance de CopColl et lance l'application
     copcoll = CopColl("config.yml")
 
