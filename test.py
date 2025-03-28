@@ -65,23 +65,28 @@ class CopColl:
         
         for category in categories_list:
             page = Gtk.Box()
-            
+
             # Récupération des données sous chaque catégorie
             category_data = next(item[category] for item in self.config["raccourcis"] if category in item)
             
             # Création d'un Gtk.Box pour contenir les sous-clés et leurs valeurs
             category_content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-            
-            for sub_key, sub_value in category_data[0].items():
-                # Ajoute un label pour chaque sous-clé et sa valeur
-                sub_label = Gtk.Label(label=f"{sub_key}: {sub_value}")
-                category_content.pack_start(sub_label, False, False, 0)
-            
+
+            # Remarque : on itère ici sur category_data qui est supposé être un dictionnaire ou une liste de dictionnaires
+            for sub_category in category_data:
+                for sub_key, sub_value in sub_category.items():
+                    # Crée un label pour chaque sous-clé et sa valeur
+                    sub_label = Gtk.Label(label=f"{sub_key}: {sub_value}")
+                    category_content.pack_start(sub_label, False, False, 0)
+
             # Ajoute le contenu de la catégorie à la page
             page.add(category_content)
             
+            # Crée un label pour le titre de l'onglet
             label = Gtk.Label(label=f"{category}")  # Titre de l'onglet
             categories_notebook.append_page(page, label)  # Ajout de la page au notebook
+
+
 
     def close_application(self, widget=None, event=None, data=None):
         """Ferme l'application"""
