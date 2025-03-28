@@ -1,3 +1,7 @@
 raccourcis:
   - adresses:
-    "Papa": "69 Rue QQchose, 12345 Une-ville"
+    - "Papa": "69 Rue QQchose, 12345 Une-ville"
+    - "Papi": "33 Avenue Autre-Machin, 67890 Une-autre-ville"
+  - numeros_tel:
+    - "Maman": "06 12 34 56 78"
+    - "Jeanne": "07 12 12 12 12"
