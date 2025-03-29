@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding:Utf-8 -*- 
 
+"""CE SCRIPT EST ÉCRIT EN PYTHON 2.7 ET NE FONCTIONNE PAR CONSÉQUENT PLUS.
+UTILISEZ copcoll-3 À LA PLACE
+"""
 
 """
 Auteur :      thuban (thuban@yeuxdelibad.net)  
