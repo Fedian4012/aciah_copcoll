@@ -1,7 +1,7 @@
 raccourcis:
-  - adresses:
-    - "Papa": "69 Rue QQchose, 12345 Une-ville"
-    - "Papi": "33 Avenue Autre-Machin, 67890 Une-autre-ville"
-  - codes-postaux:
-    - "Nantes": 44000
-    - "Riaillé": 44440
+  adresses:
+    "Papa": "69 Rue QQchose, 12345 Une-ville"
+    "Papi": "33 Avenue Autre-Machin, 67890 Une-autre-ville"
+  codes-postaux:
+    "Nantes": 44000
+    "Riaillé": 44440
