@@ -10,7 +10,7 @@ Version basée sur Python 2 :
 Version basée sur Python 3 :
     Auteur :      Fedian4012 (francois.fedian.4012@free.fr)
     licence :     GNU General Public Licence v3
-    Dépendances : python3-pygobject, python3-pyyaml, libnotify (pas une librairie Python)
+    Dépendances : pygobject, pyyaml, notify2
 
 Description : Permet de copier rapidement des morceaux de texte prédéfinis
 
@@ -20,7 +20,7 @@ from gi import require_version
 require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 import yaml
-import os
+import notify2
 
 class CopColl:
     def __init__(self, config_file):
@@ -88,12 +88,27 @@ class CopColl:
             label = Gtk.Label(label=category)
             categories_notebook.append_page(page, label)
 
+
+    def notify(self, message, title="Texte copié"):
+        """Affiche une notification avec notify2"""
+        # Initialise la connexion avec le système de notification
+        notify2.init("CopColl Notification")
+
+        # Crée une notification
+        notification = notify2.Notification(title, message)
+
+        # Affiche la notification
+        notification.show()
+
     def set_clipboard(self, text):
         """Met un texte défini dans le presse-papiers"""
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         clipboard.set_text(text, -1)
         clipboard.store()
-        os.system(f'notify-send "Texte copié" "Le texte {text} a été copié dans le presse-papiers."')
+
+        # Affiche la notification via notify2
+        self.notify(f"Le texte \"{text}\" a été copié dans le presse-papiers.")
+        
 
 def main():
     """Lance l'application GTK 3"""
