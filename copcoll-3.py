@@ -70,6 +70,7 @@ class CopColl:
 
         for category in categories_list:
             page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            page.set_homogeneous(False)  # Empêche les boutons de prendre toute la largeur
 
             # Récupération des données sous chaque catégorie
             category_data = self.config[category]
@@ -80,13 +81,22 @@ class CopColl:
                 # Connecte l'événement de clic à la fonction set_clipboard avec la valeur à copier
                 button.connect("clicked", lambda widget, text=str(sub_value): self.set_clipboard(text))
 
+                # Ajoute une marge de 10 px tout autour du bouton
+                # Pour ceux qui se demandent, il n'y a pas d'attribut margin pour les quatre côtés à la fois comme en CSS
+                button.set_margin_start(10)
+                button.set_margin_end(10) 
+                button.set_margin_bottom(10)
+                button.set_margin_top(10)
+
+                # Fixe une taille raisonnable pour les boutons
+                button.set_size_request(200, -1)  # Ajuste la largeur des boutons, la hauteur s'adaptera
+
                 # Ajoute le bouton au conteneur
                 page.pack_start(button, False, False, 0)
 
             # Crée un label pour le titre de l'onglet
             label = Gtk.Label(label=category)
             categories_notebook.append_page(page, label)
-
 
     def notify(self, message, title="Texte copié"):
         """Affiche une notification avec notify2"""
@@ -112,7 +122,7 @@ class CopColl:
 def main():
     """Lance l'application GTK 3"""
     app = CopColl("config.yml")
-    Gtk.main()  # GTK 3 utilise toujours Gtk.main()
+    Gtk.main()
 
 if __name__ == "__main__":
     main()
