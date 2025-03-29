@@ -45,7 +45,6 @@ class CopColl:
 
         # Crée une boîte verticale
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-
         # Affiche les informations de la config dans la fenêtre
         self.show_config_in_window(vbox)
 
@@ -57,6 +56,7 @@ class CopColl:
 
         # Affiche la fenêtre
         self.window.show_all()
+
 
     def show_config_in_window(self, vbox):
         """Affiche la configuration dans la fenêtre"""
@@ -92,9 +92,6 @@ class CopColl:
             # Crée un label pour le titre de l'onglet
             label = Gtk.Label(label=category)
             categories_notebook.append_page(page, label)
-
-        # Ajoute un style à l'onglet sélectionné
-        categories_notebook.get_style_context().add_class("notebook-tab")
 
     def notify(self, message, title="Texte copié"):
         """Affiche une notification avec notify2"""
