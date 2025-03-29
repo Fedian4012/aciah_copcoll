@@ -10,12 +10,14 @@ Version basée sur Python 2 :
 Version basée sur Python 3 :
     Auteur :      Fedian4012 (francois.fedian.4012@free.fr)
     licence :     GNU General Public Licence v3
-    Dépendances : pygobject, pyyaml, notify2
+    Dépendances : pygobject, pyyaml, notify2, dbus (dépendance de notify2)
 
 Description : Permet de copier rapidement des morceaux de texte prédéfinis
 
 """
 
+from gi import require_version
+require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 import yaml
 import notify2
