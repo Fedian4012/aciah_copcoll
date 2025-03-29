@@ -21,6 +21,11 @@ require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 import yaml
 import notify2
+import os
+
+NAME = "copcoll"
+CONFIG = os.path.expanduser("~/Repos Git/aciah_copcoll/config.yml")
+W,H = 240, 300 # largeur et hauteur
 
 class CopColl:
     def __init__(self, config_file):
@@ -34,8 +39,8 @@ class CopColl:
                 return yaml.safe_load(config_file)
         except FileNotFoundError:
             return {
-                "raccourcis": {
-                    "E-mail association Aciah": {"Aciah": "aciah@free.fr"}
+                "E-mails": {
+                    "Association ACIAH": "aciah@free.fr"
                 }
             }
 
@@ -43,7 +48,7 @@ class CopColl:
         """Crée la fenêtre principale et affiche la config dans l'UI"""
         self.window = Gtk.Window()
         self.window.set_title("CopColl")
-        self.window.set_default_size(400, 300)
+        self.window.set_default_size(W, H)
 
         # Crée une boîte verticale
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
@@ -117,7 +122,7 @@ class CopColl:
 
 def main():
     """Lance l'application GTK 3"""
-    app = CopColl("config.yml")
+    app = CopColl(CONFIG)
     Gtk.main()
 
 if __name__ == "__main__":
