@@ -12,7 +12,7 @@ Version basée sur Python 3 :
     licence :     GNU General Public Licence v3
     Dépendances : pygobject, pyyaml, notify2, dbus (dépendance de notify2)
 
-Description : Permet de copier rapidement des morceaux de texte prédéfinis
+Description : Permet de copier/coller rapidement des morceaux de texte prédéfinis
 
 """
 
@@ -44,6 +44,13 @@ class CopColl:
                 }
             }
 
+    def save_config_file(self, file, content):
+        try:
+            with open(file, "w"):
+                yaml.dump_all(content, indent=2)
+        except Exception as e:
+            print(f"Erreur: {e}")
+
     def create_window(self):
         """Crée la fenêtre principale et affiche la config dans l'UI"""
         self.window = Gtk.Window()
@@ -71,7 +78,7 @@ class CopColl:
 
         categories_notebook = Gtk.Notebook()
         categories_notebook.set_tab_pos(Gtk.PositionType.LEFT)
-        vbox.pack_start(categories_notebook, True, True, 0)  # `pack_start()` au lieu de `append()`
+        vbox.pack_start(categories_notebook, True, True, 0)
 
         for category in categories_list:
             page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -88,7 +95,6 @@ class CopColl:
                 button.set_margin_end(10)    # Marge à droite
                 button.set_margin_bottom(10) # Marge en bas
                 button.set_margin_top(10)    # Marge en haut
-
 
                 # Connecte l'événement de clic à la fonction set_clipboard avec la valeur à copier
                 button.connect("clicked", lambda widget, text=str(sub_value): self.set_clipboard(text))
