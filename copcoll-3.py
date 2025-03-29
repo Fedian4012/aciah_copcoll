@@ -62,7 +62,7 @@ class CopColl:
 
     def show_config_in_window(self, vbox):
         """Affiche la configuration dans la fenêtre"""
-        categories_list = list(self.config["raccourcis"].keys())
+        categories_list = list(self.config.keys())
 
         categories_notebook = Gtk.Notebook()
         categories_notebook.set_tab_pos(Gtk.PositionType.LEFT)
@@ -72,8 +72,7 @@ class CopColl:
             page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
             # Récupération des données sous chaque catégorie
-            category_data = self.config["raccourcis"][category]
-
+            category_data = self.config[category]
             for sub_key, sub_value in category_data.items():
                 # Crée un bouton avec la clé comme libellé
                 button = Gtk.Button(label=sub_key)
