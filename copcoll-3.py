@@ -58,12 +58,12 @@ class CopColl:
         self.window.set_default_size(W, H)
 
         # Crée une boîte verticale
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        self.vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         # Affiche les informations de la config dans la fenêtre
-        self.show_config_in_window(vbox)
+        self.show_config_in_window(self.vbox)
 
         # Ajoute la boîte contenant les widgets à la fenêtre
-        self.window.add(vbox)  # `add()` au lieu de `set_child()`
+        self.window.add(self.vbox)  # `add()` au lieu de `set_child()`
 
         # Gère l'événement de fermeture de la fenêtre
         self.window.connect('delete-event', Gtk.main_quit)
@@ -93,6 +93,10 @@ class CopColl:
 
             else:
                 for sub_key, sub_value in category_data.items():
+                    
+                    # Crée une hbox pour les fonctions de suppression et édition
+                    hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+
                     # Crée un bouton avec la clé comme libellé
                     button = Gtk.Button(label=sub_key)
 
@@ -105,9 +109,35 @@ class CopColl:
 
                     # Connecte l'événement de clic à la fonction set_clipboard avec la valeur à copier
                     button.connect("clicked", lambda widget, text=str(sub_value): self.set_clipboard(text))
+                    
+                    # Ajoute le bouton au début du container
+                    hbox.pack_start(button, False, False, 0)
 
-                    # Ajoute le bouton au conteneur
-                    page.pack_start(button, False, False, 0)
+                    # Crée un bouton pour l'édition
+                    edit_button = Gtk.Button()
+                    edit_icon = Gtk.Image.new_from_icon_name("edit", Gtk.IconSize.BUTTON)  # "edit" est l'icône du stylo
+                    edit_button.set_image(edit_icon)
+
+                    edit_button.set_margin_start(10) 
+                    edit_button.set_margin_end(10)   
+                    edit_button.set_margin_bottom(10)                   
+                    edit_button.set_margin_top(10) 
+
+                    hbox.pack_end(edit_button, False, False, 0)
+
+                    # Créer un bouton avec une icône de poubelle (pour supprimer)
+                    delete_button = Gtk.Button()
+                    delete_icon = Gtk.Image.new_from_icon_name("trash", Gtk.IconSize.BUTTON)  # "trash" est l'icône de la poubelle
+                    delete_button.set_image(delete_icon)
+                    hbox.pack_end(delete_button, False, False, 0)
+
+                    delete_button.set_margin_start(10) 
+                    delete_button.set_margin_end(10)   
+                    delete_button.set_margin_bottom(10)                   
+                    delete_button.set_margin_top(10)
+                    
+                    # Ajoute les boutons au conteneur
+                    page.pack_start(hbox, False, False, 0)
 
             # Crée un label pour le titre de l'onglet
             label = Gtk.Label(label=category)
@@ -116,7 +146,7 @@ class CopColl:
     def notify(self, message, title="Texte copié"):
         """Affiche une notification avec notify2"""
         # Initialise la connexion avec le système de notification
-        notify2.init("CopColl Notification")
+        notify2.init("CopColl")
 
         # Crée une notification
         notification = notify2.Notification(title, message)
