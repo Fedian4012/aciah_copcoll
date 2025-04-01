@@ -85,22 +85,29 @@ class CopColl:
 
             # Récupération des données sous chaque catégorie
             category_data = self.config[category]
-            for sub_key, sub_value in category_data.items():
-                # Crée un bouton avec la clé comme libellé
-                button = Gtk.Button(label=sub_key)
 
-                # Ajoute des marges autour des boutons
-                # Il n'y a pas d'attribut margin comme en CSS
-                button.set_margin_start(10)  # Marge à gauche
-                button.set_margin_end(10)    # Marge à droite
-                button.set_margin_bottom(10) # Marge en bas
-                button.set_margin_top(10)    # Marge en haut
+            # Cas de la catégorie vide
+            if not category_data:
+                label = Gtk.Label(label="Cette catégorie est vide")
+                page.pack_start(label, False, False, 0)
 
-                # Connecte l'événement de clic à la fonction set_clipboard avec la valeur à copier
-                button.connect("clicked", lambda widget, text=str(sub_value): self.set_clipboard(text))
+            else:
+                for sub_key, sub_value in category_data.items():
+                    # Crée un bouton avec la clé comme libellé
+                    button = Gtk.Button(label=sub_key)
 
-                # Ajoute le bouton au conteneur
-                page.pack_start(button, False, False, 0)
+                    # Ajoute des marges autour des boutons
+                    # Il n'y a pas d'attribut margin comme en CSS
+                    button.set_margin_start(10)  # Marge à gauche
+                    button.set_margin_end(10)    # Marge à droite
+                    button.set_margin_bottom(10) # Marge en bas
+                    button.set_margin_top(10)    # Marge en haut
+
+                    # Connecte l'événement de clic à la fonction set_clipboard avec la valeur à copier
+                    button.connect("clicked", lambda widget, text=str(sub_value): self.set_clipboard(text))
+
+                    # Ajoute le bouton au conteneur
+                    page.pack_start(button, False, False, 0)
 
             # Crée un label pour le titre de l'onglet
             label = Gtk.Label(label=category)
