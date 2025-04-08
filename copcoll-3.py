@@ -140,8 +140,32 @@ class CopColl:
                     page.pack_start(hbox, False, False, 0)
 
             # Crée un label pour le titre de l'onglet
-            label = Gtk.Label(label=category)
-            categories_notebook.append_page(page, label)
+            hbox_for_notebook = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+            category_name_label = Gtk.Label(label=category)
+            hbox_for_notebook.pack_start(category_name_label, False, False, 0)
+            
+            # Crée un bouton pour l'édition
+            edit_button = Gtk.Button()
+            edit_icon = Gtk.Image.new_from_icon_name("edit", Gtk.IconSize.BUTTON)  # "edit" est l'icône du stylo
+            edit_button.set_image(edit_icon)
+            edit_button.set_margin_start(10) 
+            edit_button.set_margin_end(10)   
+            edit_button.set_margin_bottom(10)                   
+            edit_button.set_margin_top(10) 
+            hbox_for_notebook.pack_end(edit_button, False, False, 0)
+            
+            # Créer un bouton avec une icône de poubelle (pour supprimer)
+            delete_button = Gtk.Button()
+            delete_icon = Gtk.Image.new_from_icon_name("trash", Gtk.IconSize.BUTTON)  # "trash" est l'icône de la poubelle
+            delete_button.set_image(delete_icon)
+            delete_button.set_margin_start(10) 
+            delete_button.set_margin_end(10)   
+            delete_button.set_margin_bottom(10)                   
+            delete_button.set_margin_top(10)
+            hbox_for_notebook.pack_end(delete_button, False, False, 0)
+            
+            hbox_for_notebook.show_all()
+            categories_notebook.append_page(page, hbox_for_notebook)
 
     def notify(self, message, title="Texte copié"):
         """Affiche une notification avec notify2"""
@@ -162,6 +186,11 @@ class CopColl:
 
         # Affiche la notification via notify2
         self.notify(f"Le texte \"{text}\" a été copié dans le presse-papiers.")
+
+    def reload(self, vbox):
+        for widget in vbox.get_children():
+            vbox.remove(widget)
+        self.show_config_in_window(vbox)
 
 def main():
     """Lance l'application GTK 3"""
