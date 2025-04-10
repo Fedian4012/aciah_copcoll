@@ -71,33 +71,72 @@ class CopColl:
         # Affiche la fenêtre
         self.window.show_all()
 
+    def create_window(self):
+        """Crée la fenêtre principale et affiche la config dans l'interface"""
+        self.window = Gtk.Window()
+        self.window.set_title("CopColl")
+        self.window.set_default_size(W, H)
 
-    def show_config_in_window(self, vbox):
-        """Affiche la configuration dans la fenêtre"""
-        categories_list = list(self.config.keys())
+        # Crée une boîte verticale
+        self.vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        # Affiche les informations de la config dans la fenêtre
+        self.show_config_in_window(self.vbox)
 
-        categories_notebook = Gtk.Notebook()
-        categories_notebook.set_tab_pos(Gtk.PositionType.LEFT)
-        vbox.pack_start(categories_notebook, True, True, 0)
+        # Ajoute la boîte contenant les widgets à la fenêtre
+        self.window.add(self.vbox)
 
-        for category in categories_list:
-            page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        # Gère l'événement de fermeture de la fenêtre
+        self.window.connect('delete-event', Gtk.main_quit)
 
-            # Récupération des données sous chaque catégorie
+        # Affiche la fenêtre
+        self.window.show_all()
+
+    def create_window(self):
+        """Crée la fenêtre principale et affiche la config dans l'interface"""
+        self.window = Gtk.Window()
+        self.window.set_title("CopColl")
+        self.window.set_default_size(W, H)
+
+        # Crée une boîte verticale principale
+        main_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+
+        # Crée le notebook pour les catégories
+        self.categories_notebook = Gtk.Notebook()
+        self.categories_notebook.set_tab_pos(Gtk.PositionType.LEFT)
+        main_vbox.pack_start(self.categories_notebook, True, True, 0)
+
+        # Affiche les informations de la config dans le notebook
+        self.show_config_in_notebook()
+
+        # Bouton global pour créer une nouvelle catégorie
+        create_category_button = Gtk.Button(label="Créer une nouvelle catégorie")
+        create_category_button.connect("clicked", self.dummy_function)
+        main_vbox.pack_start(create_category_button, False, False, 10)
+
+        # Ajoute la boîte principale à la fenêtre
+        self.window.add(main_vbox)
+
+        # Connecte l'événement de fermeture de la fenêtre
+        self.window.connect('delete-event', Gtk.main_quit)
+
+        # Affiche la fenêtre
+        self.window.show_all()
+
+    def show_config_in_notebook(self):
+        """Affiche la configuration dans le notebook"""
+        for category in self.config.keys():
+            # Crée une VBox pour la page de la catégorie
+            category_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+
             category_data = self.config[category]
 
-            # Cas de la catégorie vide
             if not category_data:
                 label = Gtk.Label(label="Cette catégorie est vide")
-                page.pack_start(label, False, False, 0)
-
+                category_vbox.pack_start(label, False, False, 0)
             else:
                 for sub_key, sub_value in category_data.items():
-                    
-                    # Crée une hbox pour les fonctions de suppression et édition
                     hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
 
-                    # Crée un bouton avec la clé comme libellé
                     button = Gtk.Button(label=sub_key)
 
                     # Ajoute des marges autour des boutons
@@ -113,60 +152,35 @@ class CopColl:
                     # Ajoute le bouton au début du container
                     hbox.pack_start(button, False, False, 0)
 
-                    # Crée un bouton pour l'édition
+                    # Bouton éditer
                     edit_button = Gtk.Button()
-                    edit_icon = Gtk.Image.new_from_icon_name("edit", Gtk.IconSize.BUTTON)  # "edit" est l'icône du stylo
+                    edit_icon = Gtk.Image.new_from_icon_name("document-edit", Gtk.IconSize.BUTTON)
                     edit_button.set_image(edit_icon)
-
-                    edit_button.set_margin_start(10) 
-                    edit_button.set_margin_end(10)   
-                    edit_button.set_margin_bottom(10)                   
-                    edit_button.set_margin_top(10) 
-
+                    edit_button.connect("clicked", self.dummy_function)
                     hbox.pack_end(edit_button, False, False, 0)
 
-                    # Créer un bouton avec une icône de poubelle (pour supprimer)
+                    # Bouton supprimer
                     delete_button = Gtk.Button()
-                    delete_icon = Gtk.Image.new_from_icon_name("trash", Gtk.IconSize.BUTTON)  # "trash" est l'icône de la poubelle
+                    delete_icon = Gtk.Image.new_from_icon_name("edit-delete", Gtk.IconSize.BUTTON)
                     delete_button.set_image(delete_icon)
+                    delete_button.connect("clicked", self.dummy_function)
                     hbox.pack_end(delete_button, False, False, 0)
 
-                    delete_button.set_margin_start(10) 
-                    delete_button.set_margin_end(10)   
-                    delete_button.set_margin_bottom(10)                   
-                    delete_button.set_margin_top(10)
-                    
-                    # Ajoute les boutons au conteneur
-                    page.pack_start(hbox, False, False, 0)
+                    category_vbox.pack_start(hbox, False, False, 0)
 
-            # Crée un label pour le titre de l'onglet
-            hbox_for_notebook = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-            category_name_label = Gtk.Label(label=category)
-            hbox_for_notebook.pack_start(category_name_label, False, False, 0)
-            
-            # Crée un bouton pour l'édition
-            edit_button = Gtk.Button()
-            edit_icon = Gtk.Image.new_from_icon_name("edit", Gtk.IconSize.BUTTON)  # "edit" est l'icône du stylo
-            edit_button.set_image(edit_icon)
-            edit_button.set_margin_start(10) 
-            edit_button.set_margin_end(10)   
-            edit_button.set_margin_bottom(10)                   
-            edit_button.set_margin_top(10) 
-            hbox_for_notebook.pack_end(edit_button, False, False, 0)
-            
-            # Créer un bouton avec une icône de poubelle (pour supprimer)
-            delete_button = Gtk.Button()
-            delete_icon = Gtk.Image.new_from_icon_name("trash", Gtk.IconSize.BUTTON)  # "trash" est l'icône de la poubelle
-            delete_button.set_image(delete_icon)
-            delete_button.set_margin_start(10) 
-            delete_button.set_margin_end(10)   
-            delete_button.set_margin_bottom(10)                   
-            delete_button.set_margin_top(10)
-            hbox_for_notebook.pack_end(delete_button, False, False, 0)
-            
-            hbox_for_notebook.show_all()
-            categories_notebook.append_page(page, hbox_for_notebook)
+            # Bouton pour ajouter un nouveau bouton dans cette catégorie
+            create_button = Gtk.Button(label="Ajouter un nouveau bouton")
+            create_button.connect("clicked", self.dummy_function)
+            category_vbox.pack_end(create_button, False, False, 10)
 
+            # Ajoute la page au notebook
+            label = Gtk.Label(label=category)
+            self.categories_notebook.append_page(category_vbox, label)
+
+    def dummy_function(self, widget):
+        """Fonction temporaire pour les boutons vides"""
+        print(f"Bouton cliqué : {widget.get_label() or 'Icône'}")
+    
     def notify(self, message, title="Texte copié"):
         """Affiche une notification avec notify2"""
         # Initialise la connexion avec le système de notification
