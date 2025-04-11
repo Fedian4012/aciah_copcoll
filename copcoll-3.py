@@ -33,10 +33,12 @@ class CopColl:
         self.create_window()
 
     def load_config_file(self, file):
-        """Charge le fichier de configuration YAML"""
         try:
             with open(file, "r") as config_file:
-                return yaml.safe_load(config_file)
+                data = yaml.safe_load(config_file)
+                if data is None:
+                    data = {}  # Très important : fichier vide = dictionnaire vide
+                return data
         except FileNotFoundError:
             return {
                 "E-mails": {
@@ -47,29 +49,9 @@ class CopColl:
     def save_config_file(self, file, content):
         try:
             with open(file, "w"):
-                yaml.dump_all(content, indent=2)
+                yaml.dump(content, indent=2)
         except Exception as e:
             print(f"Erreur: {e}")
-
-    def create_window(self):
-        """Crée la fenêtre principale et affiche la config dans l'UI"""
-        self.window = Gtk.Window()
-        self.window.set_title("CopColl")
-        self.window.set_default_size(W, H)
-
-        # Crée une boîte verticale
-        self.vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        # Affiche les informations de la config dans la fenêtre
-        self.show_config_in_window(self.vbox)
-
-        # Ajoute la boîte contenant les widgets à la fenêtre
-        self.window.add(self.vbox)  # `add()` au lieu de `set_child()`
-
-        # Gère l'événement de fermeture de la fenêtre
-        self.window.connect('delete-event', Gtk.main_quit)
-
-        # Affiche la fenêtre
-        self.window.show_all()
 
     def create_window(self):
         """Crée la fenêtre principale et affiche la config dans l'interface"""
@@ -98,12 +80,12 @@ class CopColl:
         self.window.set_default_size(W, H)
 
         # Crée une boîte verticale principale
-        main_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        self.main_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
 
         # Crée le notebook pour les catégories
         self.categories_notebook = Gtk.Notebook()
         self.categories_notebook.set_tab_pos(Gtk.PositionType.LEFT)
-        main_vbox.pack_start(self.categories_notebook, True, True, 0)
+        self.main_vbox.pack_start(self.categories_notebook, True, True, 0)
 
         # Affiche les informations de la config dans le notebook
         self.show_config_in_notebook()
@@ -111,10 +93,10 @@ class CopColl:
         # Bouton global pour créer une nouvelle catégorie
         create_category_button = Gtk.Button(label="Créer une nouvelle catégorie")
         create_category_button.connect("clicked", self.dummy_function)
-        main_vbox.pack_start(create_category_button, False, False, 10)
+        self.main_vbox.pack_start(create_category_button, False, False, 10)
 
         # Ajoute la boîte principale à la fenêtre
-        self.window.add(main_vbox)
+        self.window.add(self.main_vbox)
 
         # Connecte l'événement de fermeture de la fenêtre
         self.window.connect('delete-event', Gtk.main_quit)
@@ -170,13 +152,73 @@ class CopColl:
 
             # Bouton pour ajouter un nouveau bouton dans cette catégorie
             create_button = Gtk.Button(label="Ajouter un nouveau bouton")
-            create_button.connect("clicked", self.dummy_function)
+            create_button.connect("clicked", lambda widget: self.pop_up_to_create_button(category))
             category_vbox.pack_end(create_button, False, False, 10)
 
             # Ajoute la page au notebook
             label = Gtk.Label(label=category)
             self.categories_notebook.append_page(category_vbox, label)
 
+    def pop_up_to_create_button(self, category):
+        """Affiche une boîte de dialogue pour ajouter un nouveau bouton dans la catégorie spécifiée"""
+        dialog = Gtk.Dialog(title="Nouveau bouton", parent=self.window, flags=0)
+        dialog.set_default_size(400, 200)
+
+        # Conteneur principal de la boîte de dialogue
+        content_area = dialog.get_content_area()
+
+        # Première ligne : labels
+        labels_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        title_label = Gtk.Label(label="Titre")
+        rac_label = Gtk.Label(label="Nouveau texte")
+        rac_label.set_size_request(150, -1)
+        labels_box.pack_start(title_label, True, True, 5)
+        labels_box.pack_start(rac_label, True, True, 5)
+        content_area.pack_start(labels_box, False, False, 5)
+
+        # Deuxième ligne : champs de saisie
+        entries_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        title_entry = Gtk.Entry()
+        rac_textview = Gtk.TextView()
+        rac_textview.set_size_request(150, -1)
+        entries_box.pack_start(title_entry, True, True, 5)
+        entries_box.pack_start(rac_textview, True, True, 5)
+        content_area.pack_start(entries_box, False, False, 5)
+
+        # Bouton d'ajout
+        add_button = Gtk.Button(label="Ajouter")
+        add_button.connect(
+        "clicked",
+        self.add_to_config,
+        title_entry,
+        rac_textview,
+        category,
+        dialog
+        )   
+        content_area.pack_start(add_button, False, False, 10)
+
+        dialog.show_all()
+
+    def add_to_config(self, button, title_entry, rac_textview, category, dialog):
+        """Crée le nouveau bouton grâce aux données de la pop-up"""
+        title = title_entry.get_text()
+        buffer = rac_textview.get_buffer()
+        start_iter = buffer.get_start_iter()
+        end_iter = buffer.get_end_iter()
+        content = buffer.get_text(start_iter, end_iter, True)
+
+        if not title.strip() or not content.strip():
+            print("Titre ou contenu vide.")
+            return
+
+        if not isinstance(self.config.get(category), dict):
+            self.config[category] = {}
+
+        self.config[category][title] = content
+        self.save_config_file(CONFIG, self.config)
+        self.reload(self.main_vbox)
+        dialog.destroy()
+    
     def dummy_function(self, widget):
         """Fonction temporaire pour les boutons vides"""
         print(f"Bouton cliqué : {widget.get_label() or 'Icône'}")
@@ -204,7 +246,8 @@ class CopColl:
     def reload(self, vbox):
         for widget in vbox.get_children():
             vbox.remove(widget)
-        self.show_config_in_window(vbox)
+        self.show_config_in_notebook()
+        vbox.show_all()
 
 def main():
     """Lance l'application GTK 3"""
