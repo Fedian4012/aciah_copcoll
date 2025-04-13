@@ -13,7 +13,6 @@ Version basée sur Python 3 :
     Dépendances : pygobject, pyyaml, notify2, dbus (dépendance de notify2)
 
 Description : Permet de copier/coller rapidement des morceaux de texte prédéfinis
-
 """
 
 from gi import require_version
@@ -28,6 +27,8 @@ CONFIG = os.path.expanduser("~/Repos Git/aciah_copcoll/config.yml")
 W,H = 240, 300 # largeur et hauteur
 
 class CopColl:
+    categories_notebook: Gtk.Notebook = None
+
     def __init__(self, config_file):
         self.config = self.load_config_file(config_file)
         self.create_window()
@@ -47,31 +48,18 @@ class CopColl:
             }
 
     def save_config_file(self, file, content):
+        """Sauvegarde le fichier de configuration"""
         try:
-            with open(file, "w"):
-                yaml.dump(content, indent=2)
+            with open(file, "w") as f:
+                yaml.dump(content, f, indent=2, sort_keys=False, allow_unicode=True)
+
+                """Voici quelques infos sur les paramètres passés à yaml.dump :
+                    - indent=2 permet de définir les niveaux d'indentation à deux espaces de différence
+                    - sort_keys=False permet de ne pas trier les clés dans l'ordre alphabétique
+                    - allow_unicode=True permet de supporter les caractères spéciaux
+                """
         except Exception as e:
             print(f"Erreur: {e}")
-
-    def create_window(self):
-        """Crée la fenêtre principale et affiche la config dans l'interface"""
-        self.window = Gtk.Window()
-        self.window.set_title("CopColl")
-        self.window.set_default_size(W, H)
-
-        # Crée une boîte verticale
-        self.vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        # Affiche les informations de la config dans la fenêtre
-        self.show_config_in_window(self.vbox)
-
-        # Ajoute la boîte contenant les widgets à la fenêtre
-        self.window.add(self.vbox)
-
-        # Gère l'événement de fermeture de la fenêtre
-        self.window.connect('delete-event', Gtk.main_quit)
-
-        # Affiche la fenêtre
-        self.window.show_all()
 
     def create_window(self):
         """Crée la fenêtre principale et affiche la config dans l'interface"""
@@ -85,6 +73,8 @@ class CopColl:
         # Crée le notebook pour les catégories
         self.categories_notebook = Gtk.Notebook()
         self.categories_notebook.set_tab_pos(Gtk.PositionType.LEFT)
+        self.categories_notebook.connect("switch-page", lambda notebook, page, page_number: self.get_notebook_page(notebook, page, page_number))
+
         self.main_vbox.pack_start(self.categories_notebook, True, True, 0)
 
         # Affiche les informations de la config dans le notebook
@@ -106,10 +96,14 @@ class CopColl:
 
     def show_config_in_notebook(self):
         """Affiche la configuration dans le notebook"""
+
+        # Crée une liste de correspondances pour les catégories
+        self.page_num_to_category = []
+        
         for category in self.config.keys():
             # Crée une VBox pour la page de la catégorie
             category_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-
+            self.page_num_to_category.append(category)
             category_data = self.config[category]
 
             if not category_data:
@@ -152,12 +146,22 @@ class CopColl:
 
             # Bouton pour ajouter un nouveau bouton dans cette catégorie
             create_button = Gtk.Button(label="Ajouter un nouveau bouton")
-            create_button.connect("clicked", lambda widget: self.pop_up_to_create_button(category))
+            create_button.connect(
+                "clicked",
+                lambda widget: self.pop_up_to_create_button(
+                    self.page_num_to_category[self.categories_notebook.get_current_page()]
+                )
+            )
+
             category_vbox.pack_end(create_button, False, False, 10)
 
             # Ajoute la page au notebook
             label = Gtk.Label(label=category)
             self.categories_notebook.append_page(category_vbox, label)
+
+    def get_notebook_page(self, notebook, page, page_number):
+        category_name = self.page_num_to_category[page_number]
+        return category_name
 
     def pop_up_to_create_button(self, category):
         """Affiche une boîte de dialogue pour ajouter un nouveau bouton dans la catégorie spécifiée"""
@@ -216,7 +220,7 @@ class CopColl:
 
         self.config[category][title] = content
         self.save_config_file(CONFIG, self.config)
-        self.reload(self.main_vbox)
+        self.reload()
         dialog.destroy()
     
     def dummy_function(self, widget):
@@ -243,11 +247,14 @@ class CopColl:
         # Affiche la notification via notify2
         self.notify(f"Le texte \"{text}\" a été copié dans le presse-papiers.")
 
-    def reload(self, vbox):
-        for widget in vbox.get_children():
-            vbox.remove(widget)
+    def reload(self):
+        """Réinitialise le contenu du vbox et recharge les éléments du notebook."""
+        current_page = self.categories_notebook.get_current_page()
+        print(current_page)
+        while len(self.categories_notebook.get_children()) > 0:
+            self.categories_notebook.remove_page(0)
         self.show_config_in_notebook()
-        vbox.show_all()
+        self.window.show_all()
 
 def main():
     """Lance l'application GTK 3"""
