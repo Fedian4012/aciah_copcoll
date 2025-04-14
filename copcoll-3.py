@@ -10,7 +10,7 @@ Version basée sur Python 2 :
 Version basée sur Python 3 :
     Auteur :      Fedian4012 (francois.fedian.4012@free.fr)
     licence :     GNU General Public Licence v3
-    Dépendances : pygobject, pyyaml, notify2, dbus (dépendance de notify2)
+    Dépendances : pygobject, pyyaml, notify2
 
 Description : Permet de copier/coller rapidement des morceaux de texte prédéfinis
 """
@@ -51,7 +51,13 @@ class CopColl:
         """Sauvegarde le fichier de configuration"""
         try:
             with open(file, "w") as f:
-                yaml.dump(content, f, indent=2, sort_keys=False, allow_unicode=True)
+                yaml.dump(
+                        content,
+                        f, 
+                        indent=2, 
+                        sort_keys=False, 
+                        allow_unicode=True
+                        )
 
                 """Voici quelques infos sur les paramètres passés à yaml.dump :
                     - indent=2 permet de définir les niveaux d'indentation à deux espaces de différence
@@ -82,7 +88,7 @@ class CopColl:
 
         # Bouton global pour créer une nouvelle catégorie
         create_category_button = Gtk.Button(label="Créer une nouvelle catégorie")
-        create_category_button.connect("clicked", self.dummy_function)
+        create_category_button.connect("clicked", lambda widget: self.pop_up_to_create_category())
         self.main_vbox.pack_start(create_category_button, False, False, 10)
 
         # Ajoute la boîte principale à la fenêtre
@@ -132,14 +138,14 @@ class CopColl:
                     edit_button = Gtk.Button()
                     edit_icon = Gtk.Image.new_from_icon_name("document-edit", Gtk.IconSize.BUTTON)
                     edit_button.set_image(edit_icon)
-                    edit_button.connect("clicked", self.dummy_function)
+                    edit_button.connect("clicked", lambda widget, category=category: self.pop_up_to_edit_button(category))
                     hbox.pack_end(edit_button, False, False, 0)
 
                     # Bouton supprimer
                     delete_button = Gtk.Button()
                     delete_icon = Gtk.Image.new_from_icon_name("edit-delete", Gtk.IconSize.BUTTON)
                     delete_button.set_image(delete_icon)
-                    delete_button.connect("clicked", self.dummy_function)
+                    delete_button.connect("clicked", lambda widget, category=category, sub_key=sub_key: self.confirm_for_delete_button(category, sub_key))
                     hbox.pack_end(delete_button, False, False, 0)
 
                     category_vbox.pack_start(hbox, False, False, 0)
@@ -222,7 +228,146 @@ class CopColl:
         self.save_config_file(CONFIG, self.config)
         self.reload()
         dialog.destroy()
+
+    def confirm_for_delete_button(self, category, button):
+        dialog = Gtk.MessageDialog(
+            parent=self.window,
+            flags=0,
+            message_type=Gtk.MessageType.QUESTION,
+            buttons=Gtk.ButtonsType.YES_NO,
+            text="Confirmation requise",
+        )
+        dialog.format_secondary_text("Êtes-vous sûr de vouloir supprimer ce bouton ?")
+
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.YES:
+            self.delete_button(category, button)
+        else:
+            return
+
+        dialog.destroy()
     
+    def delete_button(self, category, button):
+        try:
+            del self.config[category][button]
+            self.reload()
+        except KeyError:
+            print(f"La clé {button} dans la catégorie {category} n'existe pas, rien n'a été supprimé")
+    
+    def pop_up_to_create_category(self):
+        """Affiche une boîte de dialogue pour ajouter une nouvelle catégorie"""
+        dialog = Gtk.Dialog(title="Nouvelle catégorie", parent=self.window, flags=0)
+        dialog.set_default_size(400, 200)
+
+        # Conteneur principal de la boîte de dialogue
+        content_area = dialog.get_content_area()
+
+        # Première ligne : labels
+        labels_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        category_label = Gtk.Label(label="Nom de la catégorie")
+        category_label.set_size_request(150, -1)
+        labels_box.pack_start(category_label, True, True, 5)
+        content_area.pack_start(labels_box, False, False, 5)
+
+        # Deuxième ligne : champ de saisie
+        entries_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        category_entry = Gtk.Entry()
+        category_entry.set_size_request(150, -1)
+        entries_box.pack_start(category_entry, True, True, 5)
+        content_area.pack_start(entries_box, False, False, 5)
+
+        # Bouton d'ajout
+        add_button = Gtk.Button(label="Ajouter")
+        add_button.connect(
+            "clicked",
+            self.add_category_to_config,
+            category_entry,
+            dialog
+        )   
+        content_area.pack_start(add_button, False, False, 10)
+
+        dialog.show_all()
+
+    def add_category_to_config(self, button, category_entry, dialog):
+        """Ajoute la nouvelle catégorie au dictionnaire de config"""
+        category_name = category_entry.get_text()
+
+        if not category_name.strip():
+            print("Le nom de la catégorie ne peut pas être vide.")
+            return
+
+        if category_name not in self.config:
+            # Ajoute la nouvelle catégorie avec un dictionnaire vide comme valeur
+            self.config[category_name] = {}
+            self.save_config_file(CONFIG, self.config)
+            self.reload()
+            dialog.destroy()  # Ferme la boîte de dialogue après l'ajout
+        else:
+            print(f"La catégorie '{category_name}' existe déjà.")
+
+    def pop_up_to_edit_button(self, category):
+        """Affiche une boîte de dialogue pour ajouter un nouveau bouton dans la catégorie spécifiée"""
+        dialog = Gtk.Dialog(title="Éditer le bouton", parent=self.window, flags=0)
+        dialog.set_default_size(400, 200)
+
+        # Conteneur principal de la boîte de dialogue
+        content_area = dialog.get_content_area()
+
+        # Première ligne : labels
+        labels_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        title_label = Gtk.Label(label="Titre")
+        rac_label = Gtk.Label(label="Nouveau texte")
+        rac_label.set_size_request(150, -1)
+        labels_box.pack_start(title_label, True, True, 5)
+        labels_box.pack_start(rac_label, True, True, 5)
+        content_area.pack_start(labels_box, False, False, 5)
+
+        # Deuxième ligne : champs de saisie
+        entries_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        title_entry = Gtk.Entry()
+        rac_textview = Gtk.TextView()
+        rac_textview.set_size_request(150, -1)
+        entries_box.pack_start(title_entry, True, True, 5)
+        entries_box.pack_start(rac_textview, True, True, 5)
+        content_area.pack_start(entries_box, False, False, 5)
+
+        # Bouton d'ajout
+        add_button = Gtk.Button(label="Ajouter")
+        add_button.connect(
+        "clicked",
+        self.edit_button_in_config,
+        title_entry,
+        rac_textview,
+        category,
+        dialog
+        )   
+        content_area.pack_start(add_button, False, False, 10)
+
+        dialog.show_all()
+
+    def edit_button_in_config(self, button, title_entry, rac_textview, category, dialog):
+        """Crée le nouveau bouton grâce aux données de la pop-up"""
+        title = title_entry.get_text()
+        buffer = rac_textview.get_buffer()
+        start_iter = buffer.get_start_iter()
+        end_iter = buffer.get_end_iter()
+        content = buffer.get_text(start_iter, end_iter, True)
+
+        if not title.strip() or not content.strip():
+            print("Titre ou contenu vide.")
+            return
+
+        if not isinstance(self.config.get(category), dict):
+            self.config[category] = {}
+
+        self.delete_button(category, title)
+        self.config[category][title] = content
+        self.save_config_file(CONFIG, self.config)
+        self.reload()
+        dialog.destroy()
+        
+
     def dummy_function(self, widget):
         """Fonction temporaire pour les boutons vides"""
         print(f"Bouton cliqué : {widget.get_label() or 'Icône'}")
@@ -250,7 +395,6 @@ class CopColl:
     def reload(self):
         """Réinitialise le contenu du vbox et recharge les éléments du notebook."""
         current_page = self.categories_notebook.get_current_page()
-        print(current_page)
         while len(self.categories_notebook.get_children()) > 0:
             self.categories_notebook.remove_page(0)
         self.show_config_in_notebook()
