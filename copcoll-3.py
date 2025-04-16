@@ -77,7 +77,6 @@ class CopColl:
 
         self.categories_notebook = Gtk.Notebook()
         self.categories_notebook.set_tab_pos(Gtk.PositionType.LEFT)
-        # self.categories_notebook.connect("switch-page", lambda notebook, page, page_number: self.get_notebook_page(notebook, page, page_number))
 
         self.main_vbox.pack_start(self.categories_notebook, True, True, 0)
 
@@ -110,9 +109,94 @@ class CopColl:
                 button.connect("clicked", lambda widget, text=str(text): self.set_clipboard(text))
                 button.set_tooltip_text(str(alt))
                 category_vbox.pack_start(button, False, False, 0)
+            
+            create_button = Gtk.Button(label="Ajouter un nouveau bouton")
+            create_button.connect("clicked", lambda widget: self.pop_up_to_create_button(widget))
+            category_vbox.pack_end(create_button, False, False, 0)
             notebook_tab = categories_list[i]
             notebook_tab_label = Gtk.Label(label=notebook_tab)
             self.categories_notebook.append_page(category_vbox, notebook_tab_label)
+    
+    def pop_up_to_create_button(self, widget):
+        current_category = self.categories_notebook.get_current_page()
+        dialog = Gtk.Dialog(title="Ajouter un raccourci", transient_for=self.window, flags=0)
+        dialog.set_default_size(400, 300)
+
+        content_area = dialog.get_content_area()
+        
+        # Conteneur vertical pour le formulaire
+        vbox_form = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        vbox_form.set_margin_top(10)
+        vbox_form.set_margin_bottom(10)
+        vbox_form.set_margin_start(10)
+        vbox_form.set_margin_end(10)
+
+        # === Champ Titre ===
+        title_label = Gtk.Label(label="Titre")
+        title_label.set_xalign(0)
+        title_entry = Gtk.Entry()
+        title_entry.set_tooltip_text("Nouveau titre")
+        vbox_form.pack_start(title_label, False, False, 0)
+        vbox_form.pack_start(title_entry, False, False, 0)
+
+        # === Champ Nouveau texte ===
+        associated_text_label = Gtk.Label(label="Nouveau texte")
+        associated_text_label.set_xalign(0)
+        associated_text_entry = Gtk.TextView()
+        associated_text_entry.set_size_request(-1, 100)  # Largeur auto, hauteur fixe
+        vbox_form.pack_start(associated_text_label, False, False, 0)
+        vbox_form.pack_start(associated_text_entry, False, False, 0)
+
+        # === Champ Infobulle ===
+        tooltip_text_label = Gtk.Label(label="Nouvelle infobulle")
+        tooltip_text_label.set_xalign(0)
+        tooltip_text_entry = Gtk.Entry()
+        tooltip_text_entry.set_tooltip_text("Texte qui s'affichera au survol")
+        vbox_form.pack_start(tooltip_text_label, False, False, 0)
+        vbox_form.pack_start(tooltip_text_entry, False, False, 0)
+
+        # Ajout du formulaire au contenu
+        content_area.add(vbox_form)
+
+        # === Bouton Ajouter ===
+        add_button = Gtk.Button(label="Ajouter")
+        add_button.connect(
+            "clicked",
+            self.add_button_into_config,
+            title_entry,
+            associated_text_entry,
+            tooltip_text_entry,
+            current_category,
+            dialog
+        )
+        content_area.pack_start(add_button, False, False, 10)
+
+        dialog.show_all()
+
+    def add_button_into_config(self, button, title_entry, associated_text_entry, tooltip_entry, category, dialog):
+        title = title_entry.get_text()
+
+        # Pour TextView, on récupère le buffer
+        buffer = associated_text_entry.get_buffer()
+        start_iter = buffer.get_start_iter()
+        end_iter = buffer.get_end_iter()
+        text = buffer.get_text(start_iter, end_iter, True)
+
+        tooltip = tooltip_entry.get_text()
+
+        new_button = {
+            "label": title,
+            "text": text,
+            "alt": tooltip
+        }
+        
+        print(category)
+        self.config[category]["values"].append(new_button)
+        
+        self.save_config_file(config_file, self.config)
+        self.reload()
+
+        dialog.destroy()
 
     def notify(self, message, title="Texte copié"):
         notify2.init("CopColl")
