@@ -1,0 +1,67 @@
+[
+    {
+        "title": "Adresses",
+        "values": [
+            {
+                "label": "Papa",
+                "text": "69 Rue QQchose, 12345 Une-ville",
+                "alt": "L'adresse de Papa"
+            },
+            {
+                "label": "Papi",
+                "text": "33 Avenue Autre-Machin, 67890 Une-autre-ville",
+                "alt": "L'adresse de Papi"
+            }
+        ]
+    },
+    {
+        "title": "Codes postaux de villes",
+        "values": [
+            {
+                "label": "Nantes",
+                "text": "44000",
+                "alt": "Code postal de Nantes"
+            },
+            {
+                "label": "Riaillé",
+                "text": "44440",
+                "alt": "Code postal de Riaillé"
+            }
+        ]
+    },
+    {
+        "title": "Écoles",
+        "values": [
+            {
+                "label": "Maternelle/Primaire - TPS",
+                "text": "Camille Claudel",
+                "alt": "École maternelle TPS"
+            },
+            {
+                "label": "Maternelle/Primaire - Reste",
+                "text": "Robert Doisneau",
+                "alt": "École primaire"
+            },
+            {
+                "label": "Collège",
+                "text": "Louis Pasteur",
+                "alt": "Le collège"
+            },
+            {
+                "label": "Lycée",
+                "text": "Livet",
+                "alt": "Le lycée"
+            }
+        ]
+    },
+    {
+        "title": "Recettes",
+        "values": [
+            {
+                "label": "Ingrédients Flammenkuech",
+                "text": "Pâte à pizza, Fromage blanc, Lardons, Oignons",
+                "alt": "Ingrédients pour une flammenkuech"
+            }
+        ]
+    }
+]
