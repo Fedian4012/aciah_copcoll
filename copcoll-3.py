@@ -42,17 +42,17 @@ class CopColl:
                 return data
         except FileNotFoundError:
             data = [
-                {
-                    "title": "E-mails",
-                    "values": [
                         {
-                            "label": "E-mail asso ACIAH",
-                            "text": "aciah@free.fr",
-                            "alt": "L'e-mail officiel de l'association ACIAH"
+                            "title": "E-mails",
+                            "values": [
+                                {
+                                    "label": "E-mail asso ACIAH",
+                                    "text": "aciah@free.fr",
+                                    "alt": "L'e-mail officiel de l'association ACIAH"
+                                }
+                            ]
                         }
                     ]
-                }
-            ]
             return data
 
     def save_config_file(self, file, content):
