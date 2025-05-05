@@ -23,7 +23,7 @@ import notify2
 import os
 
 name = "copcoll"
-config_file = os.path.expanduser("~/Repos Git/aciah_copcoll/new-config.yml")
+config_file = os.path.expanduser("~/Repos Git/aciah_copcoll/config.yml")
 window_width, window_height = 240, 300
 
 class CopColl:
@@ -56,17 +56,14 @@ class CopColl:
             return data
 
     def save_config_file(self, file, content):
-        try:
-            with open(file, "w") as f:
-                yaml.dump(
-                    content,
-                    f,
-                    indent=2,
-                    sort_keys=False,
-                    allow_unicode=True
-                )
-        except Exception as e:
-            print(f"Erreur: {e}")
+        with open(file, "w") as f:
+            yaml.dump(
+                content,
+                f,
+                indent=2,
+                sort_keys=False,
+                allow_unicode=True
+            )
 
     def create_window(self):
         self.window = Gtk.Window()
@@ -190,7 +187,7 @@ class CopColl:
             "alt": tooltip
         }
         
-        print(category)
+        # print(category)
         self.config[category]["values"].append(new_button)
         
         self.save_config_file(config_file, self.config)
@@ -210,7 +207,7 @@ class CopColl:
         self.notify(f'Le texte "{text}" a été copié dans le presse-papiers.')
 
     def reload(self):
-        current_page = self.categories_notebook.get_current_page()
+        # current_page = self.categories_notebook.get_current_page()
         while len(self.categories_notebook.get_children()) > 0:
             self.categories_notebook.remove_page(0)
         self.show_config_in_notebook()
@@ -220,7 +217,7 @@ class CopColl:
         print("Vous avez cliqué sur un bouton")
 
 def main():
-    app = CopColl(config_file)
+    app = CopColl(config_file) # On crée une instance de l'appli
     Gtk.main()
 
 if __name__ == "__main__":

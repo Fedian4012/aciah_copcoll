@@ -47,3 +47,15 @@
   - label: Test
     text: Retest
     alt: Truc de test
+- title: Langues
+  values:
+  - label: Salut
+    text: 'Français : Salut'
+    alt: Les différentes façons de dire salut
+  - label: Salut 2
+    text: 'Français : "Salut !"
+
+      Anglais : "Hello !"
+
+      Espagnol : "¡Hola !"'
+    alt: Les différentes façons de dire "Salut !" dans différentes langues
