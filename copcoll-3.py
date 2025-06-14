@@ -26,12 +26,33 @@ name = "copcoll"
 config_file = os.path.expanduser("~/Repos Git/aciah_copcoll/config.yml")
 window_width, window_height = 240, 300
 
-class CopColl:
-    categories_notebook: Gtk.Notebook = None
+class CopColl(Gtk.Window):
+    # categories_notebook: Gtk.Notebook = None
 
     def __init__(self, config_file):
+        super().__init__()
+        self.set_title("CopColl")
+        self.set_default_size(window_width, window_height)
+
+        self.main_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+
+        self.categories_notebook = Gtk.Notebook()
+        self.categories_notebook.set_tab_pos(Gtk.PositionType.LEFT)
+
+        self.main_vbox.pack_start(self.categories_notebook, True, True, 0)
+
         self.config = self.load_config_file(config_file)
-        self.create_window()
+        self.show_config_in_notebook()
+
+        create_category_button = Gtk.Button(label="Créer une nouvelle catégorie")
+        create_category_button.connect("clicked", lambda widget: self.dummy_func())
+        self.main_vbox.pack_end(create_category_button, True, True, 0)
+
+        self.add(self.main_vbox)
+
+        self.connect('delete-event', Gtk.main_quit)
+
+        self.show_all()
 
     def load_config_file(self, file):
         try:
@@ -63,31 +84,7 @@ class CopColl:
                 indent=2,
                 sort_keys=False,
                 allow_unicode=True
-            )
-
-    def create_window(self):
-        self.window = Gtk.Window()
-        self.window.set_title("CopColl")
-        self.window.set_default_size(window_width, window_height)
-
-        self.main_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-
-        self.categories_notebook = Gtk.Notebook()
-        self.categories_notebook.set_tab_pos(Gtk.PositionType.LEFT)
-
-        self.main_vbox.pack_start(self.categories_notebook, True, True, 0)
-
-        self.show_config_in_notebook()
-
-        create_category_button = Gtk.Button(label="Créer une nouvelle catégorie")
-        create_category_button.connect("clicked", lambda widget: self.dummy_func())
-        self.main_vbox.pack_start(create_category_button, False, False, 10)
-
-        self.window.add(self.main_vbox)
-
-        self.window.connect('delete-event', Gtk.main_quit)
-
-        self.window.show_all()
+            )  
 
     def show_config_in_notebook(self):
         categories_list = []
@@ -116,7 +113,7 @@ class CopColl:
     
     def pop_up_to_create_button(self, widget):
         current_category = self.categories_notebook.get_current_page()
-        dialog = Gtk.Dialog(title="Ajouter un raccourci", transient_for=self.window, flags=0)
+        dialog = Gtk.Dialog(title="Ajouter un raccourci", transient_for=self, flags=0)
         dialog.set_default_size(400, 300)
 
         content_area = dialog.get_content_area()
