@@ -1,22 +1,21 @@
 #!/usr/bin/env python3
-# -*- coding:Utf-8 -*- 
 
 """
 Version basée sur Python 2 :
     Auteur :      thuban (thuban@yeuxdelibad.net)  
-    licence :     GNU General Public Licence v3
+    Licence :     GNU General Public Licence v3
     Dépendances : python-gtk2
 
 Version basée sur Python 3 :
     Auteur :      Fedian4012 (francois.fedian.4012@free.fr)
-    licence :     GNU General Public Licence v3
-    Dépendances : pygobject, pyyaml, notify2
+    Licence :     GNU General Public Licence v3
+    Dépendances : python3-gi, python3-yaml, python3-notify2
 
 Description : Permet de copier/coller rapidement des morceaux de texte prédéfinis
 """
 
 from gi import require_version
-require_version('Gtk', '3.0')
+require_version('Gtk', '3.0') # on dit qu'on a besoin de GTK 3
 from gi.repository import Gtk, Gdk
 import yaml
 import notify2
@@ -27,11 +26,9 @@ config_file = os.path.expanduser("~/Repos Git/aciah_copcoll/config.yml")
 window_width, window_height = 240, 300
 
 class CopColl(Gtk.Window):
-    # categories_notebook: Gtk.Notebook = None
-
     def __init__(self, config_file):
-        super().__init__()
-        self.set_title("CopColl")
+        super().__init__(title="CopColl")
+        self.set_border_width(10)
         self.set_default_size(window_width, window_height)
 
         self.main_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
@@ -64,10 +61,10 @@ class CopColl(Gtk.Window):
         except FileNotFoundError:
             data = [
                         {
-                            "title": "E-mails",
+                            "title": "ACIAH",
                             "values": [
                                 {
-                                    "label": "E-mail asso ACIAH",
+                                    "label": "E-mail",
                                     "text": "aciah@free.fr",
                                     "alt": "L'e-mail officiel de l'association ACIAH"
                                 }
@@ -84,7 +81,7 @@ class CopColl(Gtk.Window):
                 indent=2,
                 sort_keys=False,
                 allow_unicode=True
-            )  
+            )
 
     def show_config_in_notebook(self):
         categories_list = []
@@ -99,10 +96,28 @@ class CopColl(Gtk.Window):
                 label = item["label"]
                 text = item["text"]
                 alt = item["alt"]
+
+                hbox_button = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
                 button = Gtk.Button(label=label)
                 button.connect("clicked", lambda widget, text=str(text): self.set_clipboard(text))
                 button.set_tooltip_text(str(alt))
-                category_vbox.pack_start(button, False, False, 0)
+
+                stylo_icon = Gtk.Image.new_from_icon_name("document-edit", Gtk.IconSize.BUTTON)
+                bouton_edit = Gtk.Button()
+                bouton_edit.set_image(stylo_icon)
+                bouton_edit.set_tooltip_text("Éditer cet élément (non implémenté pour l'instant)")
+                bouton_edit.connect("clicked", lambda widget: self.dummy_func())
+                hbox_button.pack_end(bouton_edit, False, False, 0)
+
+                # === BOUTON SUPPRESSION ===
+                poubelle_icon = Gtk.Image.new_from_icon_name("user-trash", Gtk.IconSize.BUTTON)
+                bouton_delete = Gtk.Button()
+                bouton_delete.set_image(poubelle_icon)
+                bouton_delete.set_tooltip_text("Supprimer cet élément")
+                bouton_delete.connect("clicked", lambda widget, category=i, button=j: self.remove_button(category, button))
+                hbox_button.pack_end(bouton_delete, False, False, 0)
+                hbox_button.pack_start(button, False, False, 0)
+                category_vbox.pack_start(hbox_button, False, False, 0)
             
             create_button = Gtk.Button(label="Ajouter un nouveau bouton")
             create_button.connect("clicked", lambda widget: self.pop_up_to_create_button(widget))
@@ -186,9 +201,31 @@ class CopColl(Gtk.Window):
         
         # print(category)
         self.config[category]["values"].append(new_button)
-        
         self.save_config_file(config_file, self.config)
         self.reload()
+        dialog.destroy()
+
+    def remove_button(self, category_number, button_number):
+        category = self.config[category_number]
+        button = self.config[category_number]["values"][button_number]
+
+        dialog = Gtk.MessageDialog(
+            transient_for=self,
+            flags=0,
+            message_type=Gtk.MessageType.QUESTION,
+            buttons=Gtk.ButtonsType.YES_NO,
+            text="Voulez-vous vraiment supprimer ce bouton ?"
+        )
+        dialog.format_secondary_text(f"Le bouton {button["label"]} sera supprimé pour toujours (très longtemps).\nVoulez-vous continuer ?")
+
+        reponse = dialog.run()
+
+        if reponse == Gtk.ResponseType.YES:
+            del self.config[category_number]["values"][button_number]
+            self.save_config_file(config_file, self.config)
+            self.reload()
+        elif reponse == Gtk.ResponseType.NO:
+            self.notify(f"Le bouton '{button["label"]}' n'a pas été supprimé", title="Rien n'a été supprimé")
 
         dialog.destroy()
 
@@ -197,18 +234,18 @@ class CopColl(Gtk.Window):
         notification = notify2.Notification(title, message)
         notification.show()
 
-    def set_clipboard(self, text):
+    def set_clipboard(self, text: str):
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         clipboard.set_text(text, -1)
         clipboard.store()
-        self.notify(f'Le texte "{text}" a été copié dans le presse-papiers.')
+        self.notify(f"Le texte '{text}' a été copié dans le presse-papiers.")
 
     def reload(self):
         # current_page = self.categories_notebook.get_current_page()
         while len(self.categories_notebook.get_children()) > 0:
             self.categories_notebook.remove_page(0)
         self.show_config_in_notebook()
-        self.window.show_all()
+        self.show_all()
 
     def dummy_func(self):
         print("Vous avez cliqué sur un bouton")

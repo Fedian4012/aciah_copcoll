@@ -11,14 +11,14 @@
 
       23650 Un endroit'
     alt: L'adresse de Maman
+  - label: toto
+    text: tata
+    alt: titi
 - title: Codes postaux de villes
   values:
-  - label: Nantes
+  - label: Nantes centre-ville
     text: '44000'
-    alt: Code postal de Nantes
-  - label: Riaillé
-    text: '44440'
-    alt: Code postal de Riaillé
+    alt: Le code postal du centre-ville de Nantes
 - title: Écoles
   values:
   - label: Maternelle/Primaire - TPS
@@ -35,9 +35,6 @@
     alt: Le lycée
 - title: Recettes
   values:
-  - label: Ingrédients Flammenkuech
-    text: Pâte à pizza, Fromage blanc, Lardons, Oignons
-    alt: Ingrédients pour une flammenkuech
   - label: Pizza Margherita
     text: "Pizza tomates/mozzarella.\nIngrédients :\n - Pâte à pizza\n - Tomates\n\
       \ - Mozzarella"
@@ -59,3 +56,20 @@
 
       Espagnol : "¡Hola !"'
     alt: Les différentes façons de dire "Salut !" dans différentes langues
+- title: Gégé
+  values:
+  - label: Testage
+    text: Retestage
+    alt: Youpi !
+  - label: adresse
+    text: qqchose
+    alt: lol
+  - label: adresse
+    text: qqchose
+    alt: lol
+
+- title: Adresses
+  values:
+  - label: ACIAH
+    text: Machin truc
+    alt: infubolle

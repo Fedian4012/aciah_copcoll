@@ -1,0 +1,2 @@
+- Virer la notif au bout de 5 secondes, le temps qu'Orca la lise
+- Épingler des catégories
