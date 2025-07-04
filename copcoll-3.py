@@ -106,7 +106,7 @@ class CopColl(Gtk.Window):
                 bouton_edit = Gtk.Button()
                 bouton_edit.set_image(stylo_icon)
                 bouton_edit.set_tooltip_text("Éditer cet élément (non implémenté pour l'instant)")
-                bouton_edit.connect("clicked", lambda widget: self.dummy_func())
+                bouton_edit.connect("clicked", lambda widget, button_number=j: self.pop_up_to_edit_button(widget, button_number))
                 hbox_button.pack_end(bouton_edit, False, False, 0)
 
                 # === BOUTON SUPPRESSION ===
@@ -227,6 +227,90 @@ class CopColl(Gtk.Window):
         elif reponse == Gtk.ResponseType.NO:
             self.notify(f"Le bouton '{button["label"]}' n'a pas été supprimé", title="Rien n'a été supprimé")
 
+        dialog.destroy()
+
+    def pop_up_to_edit_button(self, widget, button_number):
+        current_category = self.categories_notebook.get_current_page()
+        dialog = Gtk.Dialog(title="Modifier le raccourci", transient_for=self, flags=0)
+        dialog.set_default_size(400, 300)
+
+        content_area = dialog.get_content_area()
+
+        # Conteneur vertical pour le formulaire
+        vbox_form = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        vbox_form.set_margin_top(10)
+        vbox_form.set_margin_bottom(10)
+        vbox_form.set_margin_start(10)
+        vbox_form.set_margin_end(10)
+
+        # === Champ Titre ===
+        title_label = Gtk.Label(label="Titre")
+        title_label.set_xalign(0)
+        title_entry = Gtk.Entry()
+        title_entry.set_text(self.config[current_category]["values"][button_number]["label"])
+        title_entry.set_tooltip_text("Nouveau titre")
+        vbox_form.pack_start(title_label, False, False, 0)
+        vbox_form.pack_start(title_entry, False, False, 0)
+
+        # === Champ Nouveau texte ===
+        associated_text_label = Gtk.Label(label="Nouveau texte")
+        associated_text_label.set_xalign(0)
+        associated_text_entry = Gtk.TextView()
+        associated_text_entry.set_size_request(-1, 100)  # Largeur auto, hauteur fixe
+        buffer = associated_text_entry.get_buffer()
+        buffer.set_text(self.config[current_category]["values"][button_number]["text"])
+        vbox_form.pack_start(associated_text_label, False, False, 0)
+        vbox_form.pack_start(associated_text_entry, False, False, 0)
+
+        # === Champ Infobulle ===
+        tooltip_text_label = Gtk.Label(label="Nouvelle infobulle")
+        tooltip_text_label.set_xalign(0)
+        tooltip_text_entry = Gtk.Entry()
+        tooltip_text_entry.set_text(self.config[current_category]["values"][button_number]["alt"])
+        tooltip_text_entry.set_tooltip_text("Texte qui s'affichera au survol")
+        vbox_form.pack_start(tooltip_text_label, False, False, 0)
+        vbox_form.pack_start(tooltip_text_entry, False, False, 0)
+
+        # Ajout du formulaire au contenu
+        content_area.add(vbox_form)
+
+        # === Bouton Enregistrer ===
+        modify_button = Gtk.Button(label="Enregistrer")
+        modify_button.connect(
+            "clicked",
+            lambda widget: self.modify_button_into_config(
+                title_entry,
+                associated_text_entry,
+                tooltip_text_entry,
+                current_category,
+                button_number,
+                dialog
+            )
+        )
+
+        content_area.pack_start(modify_button, False, False, 10)
+
+        dialog.show_all()
+
+    def modify_button_into_config(self, title_entry, associated_text_entry, tooltip_entry, current_category, button_number,dialog):
+        title = title_entry.get_text()
+
+        # Pour TextView, on récupère le buffer
+        buffer = associated_text_entry.get_buffer()
+        start_iter = buffer.get_start_iter()
+        end_iter = buffer.get_end_iter()
+        text = buffer.get_text(start_iter, end_iter, True)
+
+        tooltip = tooltip_entry.get_text()
+
+        content_to_put = {
+            "label": title,
+            "text": text,
+            "alt": tooltip
+        }
+        self.config[current_category]["values"][button_number] = content_to_put
+        self.save_config_file(config_file, self.config)
+        self.reload()
         dialog.destroy()
 
     def notify(self, message, title="Texte copié"):

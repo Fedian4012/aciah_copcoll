@@ -6,19 +6,19 @@
   - label: Papi
     text: 33 Avenue Autre-Machin, 67890 Une-autre-ville
     alt: L'adresse de Papi
-  - label: Maman
+  - label: Mamie
     text: '33 Rue de la Peugeot 806
 
       23650 Un endroit'
     alt: L'adresse de Maman
-  - label: toto
+  - label: tutu
     text: tata
     alt: titi
 - title: Codes postaux de villes
   values:
-  - label: Nantes centre-ville
-    text: '44000'
-    alt: Le code postal du centre-ville de Nantes
+  - label: Riaillé
+    text: '44440'
+    alt: Le code postal de Riaillé
 - title: Écoles
   values:
   - label: Maternelle/Primaire - TPS
@@ -67,9 +67,5 @@
   - label: adresse
     text: qqchose
     alt: lol
-
 - title: Adresses
-  values:
-  - label: ACIAH
-    text: Machin truc
-    alt: infubolle
+  values: []
