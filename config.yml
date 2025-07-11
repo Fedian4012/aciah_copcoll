@@ -11,6 +11,9 @@
 
       23650 Un endroit'
     alt: L'adresse de Maman
+  - label: Papi
+    text: quelque part, vous avez pas à savoir où
+    alt: qqchose
 - title: Codes postaux de villes
   values:
   - label: Riaillé
