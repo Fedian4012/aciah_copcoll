@@ -11,9 +11,6 @@
 
       23650 Un endroit'
     alt: L'adresse de Maman
-  - label: tutu
-    text: tata
-    alt: titi
 - title: Codes postaux de villes
   values:
   - label: Riaillé
@@ -68,4 +65,6 @@
     text: qqchose
     alt: lol
 - title: Adresses
+  values: []
+- title: Test
   values: []

@@ -15,7 +15,7 @@ Description : Permet de copier/coller rapidement des morceaux de texte prédéfi
 """
 
 from gi import require_version
-require_version('Gtk', '3.0') # on dit qu'on a besoin de GTK 3
+require_version('Gtk', '3.0') # on indique à Python qu'on a besoin de GTK 3
 from gi.repository import Gtk, Gdk
 import yaml
 import notify2
@@ -42,14 +42,14 @@ class CopColl(Gtk.Window):
         self.show_config_in_notebook()
 
         create_category_button = Gtk.Button(label="Créer une nouvelle catégorie")
-        create_category_button.connect("clicked", lambda widget: self.dummy_func())
+        create_category_button.connect("clicked", lambda widget: self.pop_up_to_create_category(widget))
         self.main_vbox.pack_end(create_category_button, True, True, 0)
 
         self.add(self.main_vbox)
 
-        self.connect('delete-event', Gtk.main_quit)
+        # self.connect('delete-event', Gtk.main_quit)
 
-        self.show_all()
+        # self.show_all()
 
     def load_config_file(self, file):
         try:
@@ -102,17 +102,17 @@ class CopColl(Gtk.Window):
                 button.connect("clicked", lambda widget, text=str(text): self.set_clipboard(text))
                 button.set_tooltip_text(str(alt))
 
-                stylo_icon = Gtk.Image.new_from_icon_name("document-edit", Gtk.IconSize.BUTTON)
+                icone_stylo = Gtk.Image.new_from_icon_name("document-edit", Gtk.IconSize.BUTTON)
                 bouton_edit = Gtk.Button()
-                bouton_edit.set_image(stylo_icon)
+                bouton_edit.set_image(icone_stylo)
                 bouton_edit.set_tooltip_text("Éditer cet élément (non implémenté pour l'instant)")
                 bouton_edit.connect("clicked", lambda widget, button_number=j: self.pop_up_to_edit_button(widget, button_number))
                 hbox_button.pack_end(bouton_edit, False, False, 0)
 
                 # === BOUTON SUPPRESSION ===
-                poubelle_icon = Gtk.Image.new_from_icon_name("user-trash", Gtk.IconSize.BUTTON)
+                icone_poubelle = Gtk.Image.new_from_icon_name("user-trash", Gtk.IconSize.BUTTON)
                 bouton_delete = Gtk.Button()
-                bouton_delete.set_image(poubelle_icon)
+                bouton_delete.set_image(icone_poubelle)
                 bouton_delete.set_tooltip_text("Supprimer cet élément")
                 bouton_delete.connect("clicked", lambda widget, category=i, button=j: self.remove_button(category, button))
                 hbox_button.pack_end(bouton_delete, False, False, 0)
@@ -313,6 +313,49 @@ class CopColl(Gtk.Window):
         self.reload()
         dialog.destroy()
 
+    def pop_up_to_create_category(self, widget):
+        dialog = Gtk.Dialog(title="Ajouter une nouvelle catégorie", transient_for=self, flags=0)
+
+        vbox_form = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        vbox_form.set_margin_top(10)
+        vbox_form.set_margin_bottom(10)
+        vbox_form.set_margin_start(10)
+        vbox_form.set_margin_end(10)
+
+        title_label = Gtk.Label(label="Nom")
+        title_label.set_xalign(0)
+        title_entry = Gtk.Entry()
+        title_entry.set_tooltip_text("Nom de la nouvelle catégorie")
+        vbox_form.pack_start(title_label, False, False, 0)
+        vbox_form.pack_start(title_entry, False, False, 0)
+
+        def on_submit(widget):
+            name = title_entry.get_text().strip()
+            if name:
+                self.add_category(title_entry)
+                dialog.destroy()
+            else:
+                title_entry.set_placeholder_text("Ce champ ne peut pas être vide")
+
+        submit_button = Gtk.Button(label="Créer la nouvelle catégorie")
+        submit_button.connect("clicked", on_submit)
+        vbox_form.pack_end(submit_button, False, False, 10)
+
+        dialog.get_content_area().add(vbox_form)
+        dialog.show_all()
+
+    def add_category(self, title_entry):
+        title = title_entry.get_text()
+
+        object_of_new_category = {
+            "title": title,
+            "values": []
+        }
+
+        self.config.append(object_of_new_category)
+        self.save_config_file(config_file, self.config)
+        self.reload()
+
     def notify(self, message, title="Texte copié"):
         notify2.init("CopColl")
         notification = notify2.Notification(title, message)
@@ -336,6 +379,8 @@ class CopColl(Gtk.Window):
 
 def main():
     app = CopColl(config_file) # On crée une instance de l'appli
+    app.connect('delete-event', Gtk.main_quit) # on fait en sorte que ça quitte proprement
+    app.show_all()
     Gtk.main()
 
 if __name__ == "__main__":
