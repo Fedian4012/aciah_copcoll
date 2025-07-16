@@ -1,49 +1,14 @@
-- title: Adresses
+- title: ACIAH
   values:
-  - label: Papa
-    text: 69 Rue QQchose, 12345 Une-ville
-    alt: L'adresse de Papa
-  - label: Papi
-    text: 33 Avenue Autre-Machin, 67890 Une-autre-ville
-    alt: L'adresse de Papi
-  - label: Papi
-    text: quelque part, vous avez pas à savoir où
-    alt: qqchose
-- title: Codes postaux de villes
+  - label: E-mail association ACIAH
+    text: aciah@free.fr
+    alt: L'e-mail officiel de l'association ACIAH
+  - label: Numéro association ACIAH
+    text: 09 77 81 55 98
+    alt: le numéro de téléphone officiel de l'association ACIAH
+- title: Bouts de code
   values:
-  - label: Riaillé
-    text: '44440'
-    alt: Le code postal de Riaillé
-- title: Recettes
-  values:
-  - label: Pizza Margherita
-    text: "Pizza tomates/mozzarella.\nIngrédients :\n - Pâte à pizza\n - Tomates\n\
-      \ - Mozzarella"
-    alt: Les ingrédients de la pizza Margherita
-- title: Langues
-  values:
-  - label: Salut
-    text: 'Français : Salut'
-    alt: Les différentes façons de dire salut
-  - label: Salut 2
-    text: 'Français : "Salut !"
-
-      Anglais : "Hello !"
-
-      Espagnol : "¡Hola !"'
-    alt: Les différentes façons de dire "Salut !" dans différentes langues
-- title: Gégé
-  values:
-  - label: Testage
-    text: Retestage
-    alt: Youpi !
-  - label: adresse
-    text: qqchose
-    alt: lol
-  - label: adresse
-    text: qqchose
-    alt: lol
-- title: Adresses 2
-  values: []
-- title: Test
-  values: []
+  - label: Fonction timer en Python
+    text: "import time\n\ndef timer(n):\n    for i in range(n):\n        print(f\"\
+      \\r{i + 1}\", end=\"\")\n        time.sleep(1)\n    print()"
+    alt: une fonction de timer simple en Python
