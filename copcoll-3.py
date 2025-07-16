@@ -1,15 +1,30 @@
-from gi import require_version
-require_version('Gtk', '3.0')
+import gi
+gi.require_version('Gtk', '3.0')
+gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk, Gdk
-import yaml
-import notify2
+
 import os
 from functools import partial
 
-name = "copcoll"
+import notify2
+import yaml
+
+"""
+Version basée sur Python 2 :
+    Auteur :      thuban (thuban@yeuxdelibad.net)  
+    licence :     GNU General Public Licence v3
+    Dépendances : python-gtk2
+
+Version basée sur Python 3 :
+    Auteur :      Fedian4012 (francois.fedian.4012@free.fr)
+    licence :     GNU General Public Licence v3
+    Dépendances : python3-gi, python3-yaml, python3-notify2
+
+Description : Permet de copier/coller rapidement des morceaux de texte prédéfinis
+"""
+
+NAME = "copcoll"
 config_file = os.path.expanduser("~/Repos Git/aciah_copcoll/config.yml")
-window_width = 240
-window_height = 300
 
 class CopColl(Gtk.Window):
     def __init__(self, config_file):
@@ -34,14 +49,7 @@ class CopColl(Gtk.Window):
         self.add(self.main_vbox)
 
     def load_config_file(self, file):
-        try:
-            with open(file, "r") as config_file:
-                data = yaml.safe_load(config_file)
-                if data is None:
-                    data = {}
-                return data
-        except FileNotFoundError:
-            data = [
+        default_value = [
                 {
                     "title": "ACIAH",
                     "values": [
@@ -53,11 +61,20 @@ class CopColl(Gtk.Window):
                     ]
                 }
             ]
-            return data
+        try:
+            with open(file, "r") as config_file:
+                data = yaml.safe_load(config_file)
+                if data is None:
+                    data = default_value
+                    
+        except (FileNotFoundError, yaml.YAMLError) as e:
+            print(f"Erreur rencontrée de type '{e}'. Valeur par défaut utilisée.")
+            data = default_value
+        return data
 
     def save_config_file(self, file, content):
-        with open(file, "w") as f:
-            yaml.dump(content, f, indent=2, sort_keys=False, allow_unicode=True)
+        with open(file, "w") as config_file:
+            yaml.dump(content, config_file, indent=2, sort_keys=False, allow_unicode=True)
 
     def show_config_in_notebook(self):
         categories_list = []
@@ -106,14 +123,20 @@ class CopColl(Gtk.Window):
             bouton_edit = Gtk.Button()
             bouton_edit.set_image(icone_stylo)
             bouton_edit.set_tooltip_text("Éditer cette catégorie")
-            bouton_edit.connect("clicked", partial(self.dummy_func))
+            bouton_edit.connect(
+                "clicked", 
+                partial(
+                    self.pop_up_to_edit_category,
+                    category_number=i
+                )
+            )
             notebook_tab_hbox.pack_end(bouton_edit, False, False, 0)
 
             icone_poubelle = Gtk.Image.new_from_icon_name("user-trash", Gtk.IconSize.BUTTON)
             bouton_delete = Gtk.Button()
             bouton_delete.set_image(icone_poubelle)
             bouton_delete.set_tooltip_text("Supprimer cette catégorie")
-            bouton_delete.connect("clicked", partial(self.dummy_func))
+            bouton_delete.connect("clicked", partial(self.remove_category, category_number=i))
             notebook_tab_hbox.pack_end(bouton_delete, False, False, 0)
 
             notebook_tab_hbox.show_all() # comme c'est une hbox, elle a besoin de ça pour s'afficher
@@ -169,7 +192,7 @@ class CopColl(Gtk.Window):
 
         dialog.show_all()
 
-    def add_button_into_config(self, button, title_entry, associated_text_entry, tooltip_entry, category, dialog):
+    def add_button_into_config(self, widget, title_entry, associated_text_entry, tooltip_entry, category, dialog):
         title = title_entry.get_text()
 
         buffer = associated_text_entry.get_buffer()
@@ -190,7 +213,7 @@ class CopColl(Gtk.Window):
         self.reload()
         dialog.destroy()
 
-    def remove_button(self, category_number, button_number):
+    def remove_button(self, widget, category_number, button_number):
         category = self.config[category_number]
         button = self.config[category_number]["values"][button_number]
 
@@ -333,6 +356,72 @@ class CopColl(Gtk.Window):
         self.config.append(object_of_new_category)
         self.save_config_file(config_file, self.config)
         self.reload()
+    
+    def remove_category(self, widget, category_number):
+        category_title = self.config[category_number]["title"]
+
+        dialog = Gtk.MessageDialog(
+            transient_for=self,
+            flags=0,
+            message_type=Gtk.MessageType.QUESTION,
+            buttons=Gtk.ButtonsType.YES_NO,
+            text="Voulez-vous vraiment supprimer cette catégorie ?"
+        )
+        dialog.format_secondary_text(f"La catégorie {category_title} sera supprimée pour toujours (très longtemps).\nVoulez-vous continuer ?")
+
+        reponse = dialog.run()
+
+        if reponse == Gtk.ResponseType.YES:
+            del self.config[category_number]
+            self.save_config_file(config_file, self.config)
+            self.reload()
+        elif reponse == Gtk.ResponseType.NO:
+            self.notify(f"La catégorie '{category_title}' n'a pas été supprimée", title="Rien n'a été supprimé")
+
+        dialog.destroy()
+    
+    def pop_up_to_edit_category(self, widget, category_number):
+        dialog = Gtk.Dialog(title="Modifier le raccourci", transient_for=self, flags=0)
+        dialog.set_default_size(400, 300)
+
+        content_area = dialog.get_content_area()
+
+        vbox_form = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        vbox_form.set_margin_top(10)
+        vbox_form.set_margin_bottom(10)
+        vbox_form.set_margin_start(10)
+        vbox_form.set_margin_end(10)
+
+        title_label = Gtk.Label(label="Titre")
+        title_label.set_xalign(0)
+        title_entry = Gtk.Entry()
+        title_entry.set_text(self.config[category_number]["title"])
+        title_entry.set_tooltip_text("Nouveau titre")
+        vbox_form.pack_start(title_label, False, False, 0)
+        vbox_form.pack_start(title_entry, False, False, 0)
+
+        content_area.add(vbox_form)
+
+        modify_button = Gtk.Button(label="Enregistrer")
+        modify_button.connect(
+            "clicked",
+            partial(
+                self.modify_category_into_config, 
+                category_number=category_number,
+                title_entry=title_entry,
+                dialog=dialog
+            )
+        )
+        
+        content_area.add(modify_button)
+        dialog.show_all()
+    
+    def modify_category_into_config(self, widget, category_number, title_entry: Gtk.Entry, dialog: Gtk.Dialog):
+        new_title = title_entry.get_text()
+        self.config[category_number]["title"] = new_title
+        self.save_config_file(config_file, self.config)
+        self.reload()
+        dialog.destroy()
 
     def notify(self, message, title="Texte copié"):
         notify2.init("CopColl")
@@ -351,12 +440,12 @@ class CopColl(Gtk.Window):
         self.show_config_in_notebook()
         self.show_all()
 
-    def dummy_func(self, *args):
+    def dummy_func(self):
         print("Vous avez cliqué sur un bouton")
 
 def main():
     app = CopColl(config_file) # On crée une instance de l'appli
-    app.connect('delete-event', Gtk.main_quit) # on fait en sorte que ça quitte proprement
+    app.connect('delete-event', Gtk.main_quit) # on fait en sorte que ça quitte proprement (en libérant la mémoire par exemple)
     app.show_all()
     Gtk.main()
 
