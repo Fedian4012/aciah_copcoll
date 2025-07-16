@@ -23,7 +23,6 @@ Version basée sur Python 3 :
 Description : Permet de copier/coller rapidement des morceaux de texte prédéfinis
 """
 
-NAME = "copcoll"
 config_file = os.path.expanduser("~/Repos Git/aciah_copcoll/config.yml")
 
 class CopColl(Gtk.Window):
@@ -47,6 +46,8 @@ class CopColl(Gtk.Window):
         self.main_vbox.pack_end(create_category_button, True, True, 0)
 
         self.add(self.main_vbox)
+
+        notify2.init("CopColl") # connexion au système de notifications
 
     def load_config_file(self, file):
         default_value = [
@@ -424,7 +425,6 @@ class CopColl(Gtk.Window):
         dialog.destroy()
 
     def notify(self, message, title="Texte copié"):
-        notify2.init("CopColl")
         notification = notify2.Notification(title, message)
         notification.show()
 
