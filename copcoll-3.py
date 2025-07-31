@@ -1,3 +1,17 @@
+"""
+Version basée sur Python 2 :
+    Auteur :      thuban (thuban@yeuxdelibad.net)
+    Licence :     GNU General Public Licence v3
+    Dépendances : python-gtk2
+
+Version basée sur Python 3 :
+    Auteur :      Fedian4012 (francois.fedian.4012@free.fr)
+    Licence :     GNU General Public Licence v3
+    Dépendances : python3-gi, python3-yaml, python3-notify2
+
+Description : Permet de copier/coller rapidement des morceaux de texte prédéfinis
+"""
+
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
@@ -9,21 +23,23 @@ from functools import partial
 import notify2
 import yaml
 
-"""
+config_file = os.path.expanduser("~/Repos Git/aciah_copcoll/config.yml")
+CSS_FILE = os.path.expanduser("~/Repos Git/aciah_copcoll/style.css")
+
+# ce texte à propos de CopColl est provisoire
+TEXTE_A_PROPOS = """
 Version basée sur Python 2 :
-    Auteur :      thuban (thuban@yeuxdelibad.net)  
-    licence :     GNU General Public Licence v3
+    Auteur :      thuban (thuban@yeuxdelibad.net)
+    Licence :     GNU General Public Licence v3
     Dépendances : python-gtk2
 
 Version basée sur Python 3 :
     Auteur :      Fedian4012 (francois.fedian.4012@free.fr)
-    licence :     GNU General Public Licence v3
+    Licence :     GNU General Public Licence v3
     Dépendances : python3-gi, python3-yaml, python3-notify2
 
 Description : Permet de copier/coller rapidement des morceaux de texte prédéfinis
 """
-
-config_file = os.path.expanduser("~/Repos Git/aciah_copcoll/config.yml")
 
 class CopColl(Gtk.Window):
     def __init__(self, config_file):
@@ -31,7 +47,29 @@ class CopColl(Gtk.Window):
         self.set_border_width(10)
         self.set_default_size(240, 300)
 
+        css_applier = Gtk.CssProvider()
+        css_applier.load_from_path(CSS_FILE)
+        Gtk.StyleContext.add_provider_for_screen(
+            Gdk.Screen.get_default(),
+            css_applier,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
+
         self.main_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+
+        # Création de la barre de menu
+        menubar = Gtk.MenuBar()
+        menu_aide = Gtk.Menu()
+        item_aide = Gtk.MenuItem(label="Aide")
+        item_aide.set_submenu(menu_aide)
+
+        # Item "À propos de CopColl"
+        item_apropos = Gtk.MenuItem(label="À propos de CopColl")
+        item_apropos.connect("activate", self.afficher_a_propos)
+        menu_aide.append(item_apropos)
+
+        menubar.append(item_aide)
+        self.main_vbox.pack_start(menubar, False, False, 0)
 
         self.categories_notebook = Gtk.Notebook()
         self.categories_notebook.set_tab_pos(Gtk.PositionType.LEFT)
@@ -62,6 +100,7 @@ class CopColl(Gtk.Window):
                     ]
                 }
             ]
+
         try:
             with open(file, "r") as config_file:
                 data = yaml.safe_load(config_file)
@@ -93,22 +132,25 @@ class CopColl(Gtk.Window):
                 button = Gtk.Button(label=label)
                 button.connect("clicked", partial(self.set_clipboard, text=text))
                 button.set_tooltip_text(str(alt))
+                button.get_style_context().add_class("copcoll-button")
 
                 icone_stylo = Gtk.Image.new_from_icon_name("document-edit", Gtk.IconSize.BUTTON)
                 bouton_edit = Gtk.Button()
                 bouton_edit.set_image(icone_stylo)
-                bouton_edit.set_tooltip_text("Éditer cet élément (non implémenté pour l'instant)")
+                bouton_edit.set_tooltip_text("Éditer cet élément")
+                bouton_edit.get_style_context().add_class("copcoll-button")
                 bouton_edit.connect("clicked", partial(self.pop_up_to_edit_button, button_number=j))
-                hbox_button.pack_end(bouton_edit, False, False, 0)
 
                 icone_poubelle = Gtk.Image.new_from_icon_name("user-trash", Gtk.IconSize.BUTTON)
                 bouton_delete = Gtk.Button()
                 bouton_delete.set_image(icone_poubelle)
                 bouton_delete.set_tooltip_text("Supprimer cet élément")
+                bouton_delete.get_style_context().add_class("copcoll-button")
                 bouton_delete.connect("clicked", partial(self.remove_button, category_number=i, button_number=j))
-                hbox_button.pack_end(bouton_delete, False, False, 0)
 
                 hbox_button.pack_start(button, False, False, 0)
+                hbox_button.pack_end(bouton_delete, False, False, 0)
+                hbox_button.pack_end(bouton_edit, False, False, 0)
                 category_vbox.pack_start(hbox_button, False, False, 0)
 
             create_button = Gtk.Button(label="Ajouter un nouveau bouton")
@@ -131,14 +173,21 @@ class CopColl(Gtk.Window):
                     category_number=i
                 )
             )
-            notebook_tab_hbox.pack_end(bouton_edit, False, False, 0)
 
             icone_poubelle = Gtk.Image.new_from_icon_name("user-trash", Gtk.IconSize.BUTTON)
             bouton_delete = Gtk.Button()
             bouton_delete.set_image(icone_poubelle)
             bouton_delete.set_tooltip_text("Supprimer cette catégorie")
-            bouton_delete.connect("clicked", partial(self.remove_category, category_number=i))
-            notebook_tab_hbox.pack_end(bouton_delete, False, False, 0)
+            bouton_delete.connect(
+                "clicked",
+                partial(
+                    self.remove_category,
+                    category_number=i
+                )
+            )
+
+            notebook_tab_hbox.pack_start(bouton_edit, False, False, 0)
+            notebook_tab_hbox.pack_start(bouton_delete, False, False, 0)
 
             notebook_tab_hbox.show_all() # comme c'est une hbox, elle a besoin de ça pour s'afficher
             self.categories_notebook.append_page(category_vbox, notebook_tab_hbox)
@@ -159,7 +208,7 @@ class CopColl(Gtk.Window):
         title_label = Gtk.Label(label="Titre")
         title_label.set_xalign(0)
         title_entry = Gtk.Entry()
-        title_entry.set_tooltip_text("Nouveau titre")
+        title_entry.set_tooltip_text("Titre du nouveau bouton")
         vbox_form.pack_start(title_label, False, False, 0)
         vbox_form.pack_start(title_entry, False, False, 0)
 
@@ -167,6 +216,8 @@ class CopColl(Gtk.Window):
         associated_text_label.set_xalign(0)
         associated_text_entry = Gtk.TextView()
         associated_text_entry.set_size_request(-1, 100)
+        associated_text_entry.set_tooltip_text("Texte associé au nouveau bouton")
+        associated_text_entry.set_accepts_tab(False) # pour qu'un appui sur Tab alors qu'on est dans cette boite de texte fasse basculer sur la boite suivante au lieu de faire une tab dans le texte de la zone
         vbox_form.pack_start(associated_text_label, False, False, 0)
         vbox_form.pack_start(associated_text_entry, False, False, 0)
 
@@ -225,7 +276,7 @@ class CopColl(Gtk.Window):
             buttons=Gtk.ButtonsType.YES_NO,
             text="Voulez-vous vraiment supprimer ce bouton ?"
         )
-        dialog.format_secondary_text(f"Le bouton {button['label']} sera supprimé pour toujours (très longtemps).\nVoulez-vous continuer ?")
+        dialog.format_secondary_text(f"Le bouton {button['label']} sera supprimé définitivement.\nVoulez-vous continuer ?")
 
         reponse = dialog.run()
 
@@ -263,6 +314,7 @@ class CopColl(Gtk.Window):
         associated_text_label.set_xalign(0)
         associated_text_entry = Gtk.TextView()
         associated_text_entry.set_size_request(-1, 100)
+        associated_text_entry.set_accepts_tab(False)
         buffer = associated_text_entry.get_buffer()
         buffer.set_text(self.config[current_category]["values"][button_number]["text"])
         vbox_form.pack_start(associated_text_label, False, False, 0)
@@ -368,7 +420,7 @@ class CopColl(Gtk.Window):
             buttons=Gtk.ButtonsType.YES_NO,
             text="Voulez-vous vraiment supprimer cette catégorie ?"
         )
-        dialog.format_secondary_text(f"La catégorie {category_title} sera supprimée pour toujours (très longtemps).\nVoulez-vous continuer ?")
+        dialog.format_secondary_text(f"La catégorie {category_title} sera supprimée définitivement.\nVoulez-vous continuer ?")
 
         reponse = dialog.run()
 
@@ -439,6 +491,21 @@ class CopColl(Gtk.Window):
             self.categories_notebook.remove_page(0)
         self.show_config_in_notebook()
         self.show_all()
+
+    def afficher_a_propos(self, widget):
+        dialog = Gtk.MessageDialog(
+            transient_for=self,
+            flags=0,
+            message_type=Gtk.MessageType.INFO,
+            buttons=Gtk.ButtonsType.OK,
+            text="À propos de CopColl",
+        )
+
+        dialog.format_secondary_text(
+            TEXTE_A_PROPOS
+        )
+        dialog.run()
+        dialog.destroy()
 
     def dummy_func(self):
         print("Vous avez cliqué sur un bouton")

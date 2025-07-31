@@ -6,9 +6,7 @@
   - label: Numéro association ACIAH
     text: 09 77 81 55 98
     alt: le numéro de téléphone officiel de l'association ACIAH
-- title: Bouts de code
-  values:
-  - label: Fonction timer en Python
-    text: "import time\n\ndef timer(n):\n    for i in range(n):\n        print(f\"\
-      \\r{i + 1}\", end=\"\")\n        time.sleep(1)\n    print()"
-    alt: une fonction de timer simple en Python
+  - label: But asso ACIAH
+    text: Proposer un OS adapté aux personnes handicapées, avec un lecteur d'écran
+      intégré, des raccourcis et... CopColl !
+    alt: Pas besoin
