@@ -1,11 +1,13 @@
 # Choses à faire
 
-[] Améliorer le try/except de load_config_file et save_config_file
+ [] Améliorer le try/except de load_config_file et save_config_file
 
-[] Virer la notif au bout de 5 secondes, le temps qu'Orca la lise
+ [] Virer la notif au bout de 5 secondes, le temps qu'Orca la lise
 
-[] Épingler des catégories
+ [] Épingler des catégories
 
-[] Modulariser
+ [] Modulariser
 
-[] Commenter et documenter avec Sphinx
+ [] Commenter et documenter avec Sphinx
+
+ [] Voir pour utiliser Font Awesome pour les icônes

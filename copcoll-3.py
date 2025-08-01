@@ -44,7 +44,6 @@ Description : Permet de copier/coller rapidement des morceaux de texte prédéfi
 class CopColl(Gtk.Window):
     def __init__(self, config_file):
         super().__init__(title="CopColl")
-        self.set_border_width(10)
         self.set_default_size(240, 300)
 
         css_applier = Gtk.CssProvider()
@@ -59,8 +58,10 @@ class CopColl(Gtk.Window):
 
         # Création de la barre de menu
         menubar = Gtk.MenuBar()
+        menubar.get_style_context().add_class("barre-menus")
         menu_aide = Gtk.Menu()
         item_aide = Gtk.MenuItem(label="Aide")
+        item_aide.get_style_context().add_class("menu")
         item_aide.set_submenu(menu_aide)
 
         # Item "À propos de CopColl"
@@ -73,7 +74,7 @@ class CopColl(Gtk.Window):
 
         self.categories_notebook = Gtk.Notebook()
         self.categories_notebook.set_tab_pos(Gtk.PositionType.LEFT)
-
+        self.categories_notebook.set_scrollable(True)
         self.main_vbox.pack_start(self.categories_notebook, True, True, 0)
 
         self.config = self.load_config_file(config_file)
@@ -85,7 +86,7 @@ class CopColl(Gtk.Window):
 
         self.add(self.main_vbox)
 
-        notify2.init("CopColl") # connexion au système de notifications
+        notify2.init("CopColl") # connexion une fois pour toutes au système de notifications
 
     def load_config_file(self, file):
         default_value = [
@@ -132,25 +133,29 @@ class CopColl(Gtk.Window):
                 button = Gtk.Button(label=label)
                 button.connect("clicked", partial(self.set_clipboard, text=text))
                 button.set_tooltip_text(str(alt))
-                button.get_style_context().add_class("copcoll-button")
+                button.get_style_context().add_class("bouton")
 
                 icone_stylo = Gtk.Image.new_from_icon_name("document-edit", Gtk.IconSize.BUTTON)
+                # Pour charger depuis un fichier : icone_stylo = Gtk.Image.new_from_file(mon-chemin)
+                icone_stylo.get_style_context().add_class("copcoll-icon")
                 bouton_edit = Gtk.Button()
                 bouton_edit.set_image(icone_stylo)
                 bouton_edit.set_tooltip_text("Éditer cet élément")
-                bouton_edit.get_style_context().add_class("copcoll-button")
+                bouton_edit.get_style_context().add_class("bouton")
                 bouton_edit.connect("clicked", partial(self.pop_up_to_edit_button, button_number=j))
 
                 icone_poubelle = Gtk.Image.new_from_icon_name("user-trash", Gtk.IconSize.BUTTON)
                 bouton_delete = Gtk.Button()
                 bouton_delete.set_image(icone_poubelle)
                 bouton_delete.set_tooltip_text("Supprimer cet élément")
-                bouton_delete.get_style_context().add_class("copcoll-button")
+                bouton_delete.get_style_context().add_class("bouton")
+                bouton_delete.get_style_context().add_class("rouge")
                 bouton_delete.connect("clicked", partial(self.remove_button, category_number=i, button_number=j))
 
                 hbox_button.pack_start(button, False, False, 0)
                 hbox_button.pack_end(bouton_delete, False, False, 0)
                 hbox_button.pack_end(bouton_edit, False, False, 0)
+                hbox_button.get_style_context().add_class("hbox-bouton")
                 category_vbox.pack_start(hbox_button, False, False, 0)
 
             create_button = Gtk.Button(label="Ajouter un nouveau bouton")
@@ -160,11 +165,13 @@ class CopColl(Gtk.Window):
             notebook_current_tab_name = categories_list[i]
             notebook_tab_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
             notebook_tab_label = Gtk.Label(label=notebook_current_tab_name)
+            notebook_tab_hbox.get_style_context().add_class("onglet-notebook")
             notebook_tab_hbox.pack_start(notebook_tab_label, False, False, 0)
 
             icone_stylo = Gtk.Image.new_from_icon_name("document-edit", Gtk.IconSize.BUTTON)
             bouton_edit = Gtk.Button()
             bouton_edit.set_image(icone_stylo)
+            bouton_edit.get_style_context().add_class("bouton")
             bouton_edit.set_tooltip_text("Éditer cette catégorie")
             bouton_edit.connect(
                 "clicked", 
@@ -173,10 +180,13 @@ class CopColl(Gtk.Window):
                     category_number=i
                 )
             )
+            bouton_edit.get_style_context().add_class("copcoll-button")
 
             icone_poubelle = Gtk.Image.new_from_icon_name("user-trash", Gtk.IconSize.BUTTON)
             bouton_delete = Gtk.Button()
             bouton_delete.set_image(icone_poubelle)
+            bouton_delete.get_style_context().add_class("bouton")
+            bouton_delete.get_style_context().add_class("rouge")
             bouton_delete.set_tooltip_text("Supprimer cette catégorie")
             bouton_delete.connect(
                 "clicked",
@@ -185,6 +195,7 @@ class CopColl(Gtk.Window):
                     category_number=i
                 )
             )
+            bouton_delete.get_style_context().add_class("copcoll-button")
 
             notebook_tab_hbox.pack_start(bouton_edit, False, False, 0)
             notebook_tab_hbox.pack_start(bouton_delete, False, False, 0)
@@ -501,9 +512,8 @@ class CopColl(Gtk.Window):
             text="À propos de CopColl",
         )
 
-        dialog.format_secondary_text(
-            TEXTE_A_PROPOS
-        )
+        dialog.format_secondary_text(TEXTE_A_PROPOS)
+
         dialog.run()
         dialog.destroy()
 
