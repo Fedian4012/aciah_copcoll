@@ -1,0 +1,77 @@
+/* .copcoll-button {
+    border: 2px solid red;
+    border:3px solid transparent;
+    background-color: black;
+    color: white;
+}
+
+.copcoll-button:focus {
+    border:3px solid purple;
+}
+
+.copcoll-button.red {
+    background-color: red;
+}
+
+.copcoll-button.red:hover {
+    background-color: cyan;
+}
+
+.copcoll-icon {
+    background-color: black;
+    -gtk-icon-transform: scale(1);
+}
+*/
+
+.barre-menus {
+    border: 1px solid black;
+    background-color: white;
+    color: black;
+    margin-bottom: 5px;
+}
+
+.menu {
+    color: black;
+}
+
+.bouton {
+    border: 1px solid black;
+}
+.bouton:focus {
+    border-width: 3px;
+    border-color: purple;
+}
+
+.icone {
+    background-color: black;
+    -gtk-icon-transform: scale(1);
+}
+
+.bouton.rouge {
+    background-color: red;
+}
+
+.bouton.rouge:focus {
+    border-color: black;
+}
+
+.bouton.rouge:hover {
+    background-color: black;
+}
+
+.hbox-bouton {
+    margin: 10px 10px 10px 10px;
+    /* border: 1px solid black; */
+}
+
+.onglet-notebook {
+    border: 1px solid black;
+    background-color: white;
+    color: black;
+}
+
+.onglet-notebook:hover, .onglet-notebook:checked {
+    border-width: 3px;
+    border-color: purple;
+    background-color: gray;
+}
