@@ -81,6 +81,7 @@ class CopColl(Gtk.Window):
         self.show_config_in_notebook()
 
         create_category_button = Gtk.Button(label="Créer une nouvelle catégorie")
+        create_category_button.get_style_context().add_class("bouton")
         create_category_button.connect("clicked", partial(self.pop_up_to_create_category))
         self.main_vbox.pack_end(create_category_button, True, True, 0)
 
@@ -159,6 +160,7 @@ class CopColl(Gtk.Window):
                 category_vbox.pack_start(hbox_button, False, False, 0)
 
             create_button = Gtk.Button(label="Ajouter un nouveau bouton")
+            create_button.get_style_context().add_class("bouton")
             create_button.connect("clicked", partial(self.pop_up_to_create_button))
             category_vbox.pack_end(create_button, False, False, 0)
 
@@ -180,7 +182,7 @@ class CopColl(Gtk.Window):
                     category_number=i
                 )
             )
-            bouton_edit.get_style_context().add_class("copcoll-button")
+            bouton_edit.get_style_context().add_class("bouton")
 
             icone_poubelle = Gtk.Image.new_from_icon_name("user-trash", Gtk.IconSize.BUTTON)
             bouton_delete = Gtk.Button()
@@ -195,7 +197,7 @@ class CopColl(Gtk.Window):
                     category_number=i
                 )
             )
-            bouton_delete.get_style_context().add_class("copcoll-button")
+            bouton_delete.get_style_context().add_class("bouton")
 
             notebook_tab_hbox.pack_start(bouton_edit, False, False, 0)
             notebook_tab_hbox.pack_start(bouton_delete, False, False, 0)

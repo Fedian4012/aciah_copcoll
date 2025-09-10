@@ -36,8 +36,17 @@
 
 .bouton {
     border: 1px solid black;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    margin-top: 0px;
 }
 .bouton:focus {
+    border-width: 3px;
+    border-color: purple;
+}
+
+.bouton:hover {
     border-width: 3px;
     border-color: purple;
 }
@@ -59,14 +68,14 @@
     background-color: black;
 }
 
-.hbox-bouton {
+/* .hbox-bouton {
     margin: 10px 10px 10px 10px;
-    /* border: 1px solid black; */
-}
+    border: 1px solid black;
+} */
 
 .onglet-notebook {
     border: 1px solid black;
-    background-color: white;
+    background-color: black;
     color: black;
 }
 
