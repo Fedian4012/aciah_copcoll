@@ -20,11 +20,13 @@ from gi.repository import Gtk, Gdk
 import os
 from functools import partial
 
-import notify2
+#import notify2
+from plyer import notification
 import yaml
 
-config_file = os.path.expanduser("~/Repos Git/aciah_copcoll/config.yml")
-CSS_FILE = os.path.expanduser("~/Repos Git/aciah_copcoll/style.css")
+CONFIG_FILE = os.path.expanduser("~/Projets/aciah_copcoll/config.yml")
+CSS_FILE = os.path.expanduser("~/Projets/aciah_copcoll/style.css")
+APP_NAME = "CopColl"
 
 # ce texte à propos de CopColl est provisoire
 TEXTE_A_PROPOS = """
@@ -66,7 +68,7 @@ class CopColl(Gtk.Window):
 
         # Item "À propos de CopColl"
         item_apropos = Gtk.MenuItem(label="À propos de CopColl")
-        item_apropos.connect("activate", self.afficher_a_propos)
+        item_apropos.connect("activate", self.show_about)
         menu_aide.append(item_apropos)
 
         menubar.append(item_aide)
@@ -77,7 +79,7 @@ class CopColl(Gtk.Window):
         self.categories_notebook.set_scrollable(True)
         self.main_vbox.pack_start(self.categories_notebook, True, True, 0)
 
-        self.config = self.load_config_file(config_file)
+        self.config = self.load_config_file(CONFIG_FILE)
         self.show_config_in_notebook()
 
         create_category_button = Gtk.Button(label="Créer une nouvelle catégorie")
@@ -87,7 +89,7 @@ class CopColl(Gtk.Window):
 
         self.add(self.main_vbox)
 
-        notify2.init("CopColl") # connexion une fois pour toutes au système de notifications
+        #notify2.init("CopColl") # connexion une fois pour toutes au système de notifications
 
     def load_config_file(self, file):
         default_value = [
@@ -274,7 +276,7 @@ class CopColl(Gtk.Window):
         }
 
         self.config[category]["values"].append(new_button)
-        self.save_config_file(config_file, self.config)
+        self.save_config_file(CONFIG_FILE, self.config)
         self.reload()
         dialog.destroy()
 
@@ -295,7 +297,7 @@ class CopColl(Gtk.Window):
 
         if reponse == Gtk.ResponseType.YES:
             del self.config[category_number]["values"][button_number]
-            self.save_config_file(config_file, self.config)
+            self.save_config_file(CONFIG_FILE, self.config)
             self.reload()
         elif reponse == Gtk.ResponseType.NO:
             self.notify(f"Le bouton '{button['label']}' n'a pas été supprimé", title="Rien n'a été supprimé")
@@ -376,7 +378,7 @@ class CopColl(Gtk.Window):
             "alt": tooltip
         }
         self.config[current_category]["values"][button_number] = content_to_put
-        self.save_config_file(config_file, self.config)
+        self.save_config_file(CONFIG_FILE, self.config)
         self.reload()
         dialog.destroy()
 
@@ -420,7 +422,7 @@ class CopColl(Gtk.Window):
         }
 
         self.config.append(object_of_new_category)
-        self.save_config_file(config_file, self.config)
+        self.save_config_file(CONFIG_FILE, self.config)
         self.reload()
     
     def remove_category(self, widget, category_number):
@@ -439,7 +441,7 @@ class CopColl(Gtk.Window):
 
         if reponse == Gtk.ResponseType.YES:
             del self.config[category_number]
-            self.save_config_file(config_file, self.config)
+            self.save_config_file(CONFIG_FILE, self.config)
             self.reload()
         elif reponse == Gtk.ResponseType.NO:
             self.notify(f"La catégorie '{category_title}' n'a pas été supprimée", title="Rien n'a été supprimé")
@@ -485,13 +487,17 @@ class CopColl(Gtk.Window):
     def modify_category_into_config(self, widget, category_number, title_entry: Gtk.Entry, dialog: Gtk.Dialog):
         new_title = title_entry.get_text()
         self.config[category_number]["title"] = new_title
-        self.save_config_file(config_file, self.config)
+        self.save_config_file(CONFIG_FILE, self.config)
         self.reload()
         dialog.destroy()
 
     def notify(self, message, title="Texte copié"):
-        notification = notify2.Notification(title, message)
-        notification.show()
+        notification.notify(
+            title,
+            message,
+            APP_NAME,
+            timeout=10
+        )
 
     def set_clipboard(self, widget, text: str):
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
@@ -505,7 +511,7 @@ class CopColl(Gtk.Window):
         self.show_config_in_notebook()
         self.show_all()
 
-    def afficher_a_propos(self, widget):
+    def show_about(self, widget):
         dialog = Gtk.MessageDialog(
             transient_for=self,
             flags=0,
@@ -523,8 +529,8 @@ class CopColl(Gtk.Window):
         print("Vous avez cliqué sur un bouton")
 
 def main():
-    app = CopColl(config_file) # On crée une instance de l'appli
-    app.connect('delete-event', Gtk.main_quit) # on fait en sorte que ça quitte proprement (en libérant la mémoire par exemple)
+    app = CopColl(CONFIG_FILE) # On crée une instance de l'appli
+    app.connect('delete-event', Gtk.main_quit) # on fait en sorte que l'application se ferme proprement
     app.show_all()
     Gtk.main()
 
