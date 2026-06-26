@@ -1,13 +1,21 @@
 # Choses à faire
 
- [] Améliorer le try/except de load_config_file et save_config_file
+[X] Régler focus notebook : mettre le focus à la catégorie en cours le tps qu'on touche aux boutons, et quand on revient dans les onglets, le focus passe à la catégorie qui a le hover de la souris
 
- [] Virer la notif au bout de 5 secondes, le temps qu'Orca la lise
+[] Faire des alignements propres
+    [] Aligner les boutons (éditer, supprimer) à droite, le bouton principal ou le texte de l'onglet à gauche
+    [] Mettre les mêmes marges partout, sauf entre txt/bouton principal et (edit, suppr)
 
- [] Épingler des catégories
+[] Mettre des barres de défilement pour les onglets et les contenus de catégories
 
- [] Modulariser
+[] Améliorer le try/except de load_config_file et save_config_file
 
- [] Commenter et documenter avec Sphinx
+[X] Limiter les noms de boutons et catégories à 40 caractères
 
- [] Voir pour utiliser Font Awesome pour les icônes
+[] Épingler des catégories
+
+[] Modulariser
+
+[] Commenter et documenter avec Sphinx
+
+[] Voir pour utiliser Font Awesome pour les icônes

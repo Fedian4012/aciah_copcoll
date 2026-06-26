@@ -6,10 +6,10 @@
   - label: Numéro association ACIAH
     text: 09 77 81 55 98
     alt: le numéro de téléphone officiel de l'association ACIAH
-  - label: But asso ACIAH
-    text: Proposer un OS adapté aux personnes handicapées, avec un lecteur d'écran
-      intégré, des raccourcis et... CopColl !
-    alt: Pas besoin
+  - label: But association ACIAH
+    text: Proposer un OS adapt� aux personnes handicap�es, avec un lecteur d'�cran
+      int�gr�, des raccourcis et... CopColl !
+    alt: Le but de l'association ACIAH
 - title: Machin
   values:
   - label: Machin
@@ -18,3 +18,11 @@
   - label: Truc
     text: Qq chose
     alt: Qq chose aussi
+  - label: Lorem ipsum
+    text: Dolor sit amet
+    alt: Consetectur adipiscing elit
+- title: test
+  values:
+  - label: toto
+    text: titi
+    alt: tata

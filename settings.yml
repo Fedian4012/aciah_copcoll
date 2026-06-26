@@ -1,0 +1,4 @@
+notification_timeout:
+  type: number
+  value: 20
+  name_on_form: Durée d'affichage des notifications
