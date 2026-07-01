@@ -15,10 +15,15 @@ DATA_FILE = os.path.expanduser(f"{APP_FOLDER}/data.yml") # fichier des données 
 SETTINGS_FILE = os.path.expanduser(f"{APP_FOLDER}/settings.yml") # fichier des paramètres (inutilisés pour l'instant)
 CSS_FILE = os.path.expanduser(f"{APP_FOLDER}/style.css") # le fichier CSS pour le style
 
+# --- Icônes ---
+LOGO = os.path.expanduser(f"{APP_FOLDER}/Logo_Aciah_01-2026_64.png") # chemin du fichier logo ACIAH
+ATTENTION = os.path.expanduser(f"{APP_FOLDER}/warning.png") # chemin de l'icône 'warning' 
+
 # --- Autres constantes ---
 BUTTON_CHARS_LIMIT = 40 # limite de longueur pour les noms de boutons
-CATEGORIES_CHARS_LIMIT = 20 # limite de longueur pour les noms de boutons
+CATEGORIES_CHARS_LIMIT = 20 # limite de longueur pour les noms de catégories
 MARGIN = 4 # marge entre les différents éléments
+APP_NAME = "copcoll"
 
 TEXTE_A_PROPOS = """
 Version basée sur Python 2 :
@@ -203,8 +208,8 @@ class CopColl:
 
             # On empile les éléments les uns après les autres
             notebook_tab_hbox.pack_start(notebook_tab_label, False, False, 0)
-            notebook_tab_hbox.pack_end(bouton_edit_cat, False, False, 0)
             notebook_tab_hbox.pack_end(bouton_delete_cat, False, False, 0)
+            notebook_tab_hbox.pack_end(bouton_edit_cat, False, False, 0)
             notebook_tab_hbox.show_all()
 
             # Injection de la page complète dans le Notebook
@@ -428,10 +433,13 @@ class CopColl:
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         clipboard.set_text(text, -1)
         clipboard.store()
-        self.notify(f"Le texte '{text}' a été copié dans le presse-papiers.")
+        self.notify(f"Le texte '{text}' a été copié dans le presse-papiers.", "Texte copié")
 
-    def notify(self, message, title="Texte copié"):
-        notification.notify(title, message, "Copcoll")
+    def notify(self, message, title):
+        """test si le fichier logo ACIAH est présent et avertissement si le logo ACIAH est introuvable"""
+        if LOGO and not os.path.exists(LOGO):
+            notification.notify(title="!! Logo ACIAH introuvable !!", app_icon=ATTENTION, app_name="copcoll") # ajout avertissement
+        notification.notify(title, message, app_name="copcoll", app_icon=LOGO) # ajout du logo ACIAH
 
     def reload(self):
         """Vide le notebook et force une reconstruction complète pour rafraîchir l'interface."""

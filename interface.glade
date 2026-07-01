@@ -6,7 +6,7 @@
     <property name="width-request">810</property>
     <property name="height-request">350</property>
     <property name="can-focus">False</property>
-    <property name="resizable">False</property>
+    <property name="resizable">True</property>
     
 
     <property name="title" translatable="yes">CopColl</property>

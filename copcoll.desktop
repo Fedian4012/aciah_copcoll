@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=CopColl
+Exec=python3 /home/francois/Projets/aciah_copcoll/copcoll.py
+Icon=/home/francois/Projets/aciah_copcoll/Logo_Aciah_01-2026_64.png
+Terminal=false
+Categories=Utility;
