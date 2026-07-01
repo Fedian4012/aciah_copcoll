@@ -70,6 +70,9 @@ class CopColl:
         self.build_window_content()
         self.window.show_all()
 
+    def afficher_dimensions(widget, button):
+        print(f"{button.get_allocated_width()} × {button.get_allocated_height()}")
+
     # --- ÉVÉNEMENTS LIÉS AUX SIGNAUX DE INTERFACE.GLADE ---
     
     def on_about_item_activate(self, widget):
@@ -111,10 +114,10 @@ class CopColl:
                 # Ligne contenant le bouton principal + les boutons d'action
                 # spacing=6 gère l'espace entre le gros bouton, le stylo et la poubelle
                 hbox_button = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
-                hbox_button.set_margin_start(MARGIN)   # Gauche
-                hbox_button.set_margin_end(MARGIN)     # Droite
-                hbox_button.set_margin_top(MARGIN)     # Haut
-                hbox_button.set_margin_bottom(MARGIN)  # Bas
+                # hbox_button.set_margin_start(MARGIN)   # Gauche
+                # hbox_button.set_margin_end(MARGIN)     # Droite
+                # hbox_button.set_margin_top(MARGIN)     # Haut
+                # hbox_button.set_margin_bottom(MARGIN)  # Bas
                 
                 # 1. Bouton principal de copie (Taille fixe)
                 bouton_principal = Gtk.Button(label=item["label"])
@@ -127,7 +130,7 @@ class CopColl:
                 # button.set_margin_end(MARGIN / 2)
                 
                 # On force la largeur fixe calculée, la hauteur (-1) s'adapte automatiquement
-                bouton_principal.set_size_request(TAILLE_BOUTON_40_CHAR, -1)
+                bouton_principal.set_size_request(TAILLE_BOUTON_40_CHAR, 40)
                 # On empêche le bouton de s'étirer si la fenêtre s'agrandit
                 bouton_principal.set_hexpand(False) 
 
@@ -140,6 +143,8 @@ class CopColl:
                 # bouton_edit.set_margin_bottom(MARGIN / 2)
                 # bouton_edit.set_margin_start(MARGIN / 2)
                 # bouton_edit.set_margin_end(4)
+                # bouton_edit.connect("clicked", self.afficher_dimensions)
+                bouton_edit.set_size_request(40, 40)
                 bouton_edit.connect("clicked", partial(self.pop_up_to_edit_button, button_number=j))
 
                 # 3. Bouton de suppression
@@ -152,12 +157,14 @@ class CopColl:
                 # bouton_delete.set_margin_bottom(MARGIN / 2)
                 # bouton_delete.set_margin_start(MARGIN / 2)
                 # bouton_delete.set_margin_end(MARGIN)
+                bouton_delete.set_size_request(40, 40)
+                # bouton_delete.connect("clicked", self.afficher_dimensions)
                 bouton_delete.connect("clicked", partial(self.remove_button, category_number=i, button_number=j))
 
                 # On empile de gauche à droite proprement
                 hbox_button.pack_start(bouton_principal, False, False, 0)
-                hbox_button.pack_start(bouton_edit, False, False, 0)
-                hbox_button.pack_start(bouton_delete, False, False, 0)
+                hbox_button.pack_end(bouton_delete, False, False, 0)
+                hbox_button.pack_end(bouton_edit, False, False, 0)
                 
                 category_vbox.pack_start(hbox_button, False, False, 0)
 
@@ -174,10 +181,10 @@ class CopColl:
             
             notebook_tab_hbox.set_size_request(300, 32)
 
-            notebook_tab_hbox.set_margin_top(MARGIN)
-            notebook_tab_hbox.set_margin_bottom(MARGIN)
-            notebook_tab_hbox.set_margin_start(MARGIN)
-            notebook_tab_hbox.set_margin_end(MARGIN)
+            # notebook_tab_hbox.set_margin_top(MARGIN)
+            # notebook_tab_hbox.set_margin_bottom(MARGIN)
+            # notebook_tab_hbox.set_margin_start(MARGIN)
+            # notebook_tab_hbox.set_margin_end(MARGIN)
 
             # 1. Label de la catégorie (Titre)
             notebook_tab_label = Gtk.Label(label=categ["title"])
@@ -192,8 +199,8 @@ class CopColl:
             bouton_edit_cat.set_image(Gtk.Image.new_from_icon_name("document-edit", Gtk.IconSize.BUTTON))
             bouton_edit_cat.connect("clicked", partial(self.pop_up_to_edit_category, category_number=i))
             bouton_edit_cat.get_style_context().add_class("bouton")
-            bouton_edit_cat.set_margin_top(MARGIN)
-            bouton_edit_cat.set_margin_bottom(MARGIN)
+            # bouton_edit_cat.set_margin_top(MARGIN)
+            # bouton_edit_cat.set_margin_bottom(MARGIN)
             bouton_edit_cat.set_valign(Gtk.Align.CENTER)
 
             # 3. Bouton Supprimer la catégorie
@@ -202,8 +209,8 @@ class CopColl:
             bouton_delete_cat.connect("clicked", partial(self.remove_category, category_number=i))
             bouton_delete_cat.get_style_context().add_class("bouton")
             bouton_delete_cat.get_style_context().add_class("rouge")
-            bouton_delete_cat.set_margin_top(MARGIN)
-            bouton_delete_cat.set_margin_bottom(MARGIN)
+            # bouton_delete_cat.set_margin_top(MARGIN)
+            # bouton_delete_cat.set_margin_bottom(MARGIN)
             bouton_delete_cat.set_valign(Gtk.Align.CENTER)
 
             # On empile les éléments les uns après les autres

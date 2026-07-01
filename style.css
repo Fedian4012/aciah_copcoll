@@ -44,10 +44,14 @@
 
 .bouton {
     border: 1px solid black;
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-bottom: 5px;
-    margin-top: 0px;
+    margin-left: 4px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    margin-top: 4px;
+
+    /* min-width: 40px;
+    min-height: 40px;
+    padding: 0; */
 }
 /* .bouton:focus {
     border-width: 3px;
