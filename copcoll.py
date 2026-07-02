@@ -48,6 +48,7 @@ class CopColl:
         # 2. Récupération des composants principaux définis dans le XML
         self.window = self.builder.get_object("main_window")
         self.categories_notebook = self.builder.get_object("categories_notebook")
+        self.categories_notebook.get_style_context().add_class("vbox-list-boutons")
         
         # Application du style CSS global
         self.css_applier = Gtk.CssProvider()
@@ -124,8 +125,7 @@ class CopColl:
                 bouton_principal.connect("clicked", partial(self.set_clipboard, text=str(item["text"])))
                 bouton_principal.set_tooltip_text(str(item["alt"]))
                 bouton_principal.get_style_context().add_class("bouton")
-                bouton_principal.set_margin_top(MARGIN)
-                # button.set_margin_bottom(MARGIN / 2) 
+                # button.set_margin_bottom(MARGIN / 2)
                 # bouton_principal.set_margin_start(MARGIN)
                 # button.set_margin_end(MARGIN / 2)
                 
@@ -172,7 +172,6 @@ class CopColl:
             create_button = Gtk.Button(label="Ajouter un nouveau bouton")
             create_button.get_style_context().add_class("bouton")
             create_button.set_margin_top(MARGIN)
-            create_button.set_margin_bottom(MARGIN)
             create_button.connect("clicked", partial(self.pop_up_to_create_button))
             category_vbox.pack_end(create_button, False, False, 0)
 

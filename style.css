@@ -102,3 +102,7 @@ notebook tab:checked {
     border-color: blue;
     /* background-color: gray; */
 }
+
+.vbox-list-boutons {
+    border: none;
+}
